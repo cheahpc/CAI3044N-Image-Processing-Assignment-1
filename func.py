@@ -2,8 +2,18 @@ import cv2
 import numpy as np
 import rawpy
 
+
 # Converter +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class Converter:
+    # Enumerate
+    RAW2BGR: int
+    RGB2GRAY: int
+    RGB2BGR: int
+    BGR2GRAY: int
+    BGR2RGB: int
+    GRAY2BGR: int
+    GRAY2RGB: int
+
     # Convert Raw to BGR
     def raw2bgr(imgSet, cameraWB=True):
         # Check if image is array or not
@@ -151,24 +161,13 @@ class Image:
             print("Error: Image set is empty")
             return None
         else:
-            # Loop through all images, get max height and width
-            maxHeight = max([img.shape[0] for img in imgSet])
-            maxWidth = max([img.shape[1] for img in imgSet])
-            # Concatenate all images with various size in set
-            return np.concatenate(
-                [
-                    cv2.copyMakeBorder(
-                        img,
-                        0,
-                        maxHeight - img.shape[0],
-                        0,
-                        maxWidth - img.shape[1],
-                        cv2.BORDER_CONSTANT,
-                    )
-                    for img in imgSet
-                ],
-                axis=axis,
-            )
+            # Make all image in the array with same channel size
+            for i in range(len(imgSet)):
+                if len(imgSet[i].shape) == 2:
+                    imgSet[i] = cv2.cvtColor(imgSet[i], cv2.COLOR_GRAY2BGR)
+                    
+            # Concatenate all images in the set
+            return np.concatenate(imgSet, axis=axis)
 
     # Show all images
     def showSet(imgSet, name="image"):
@@ -194,6 +193,77 @@ class Image:
 # 6. Non-Local Means Filter
 # 7. Custom Kernel Filter
 class SmoothFilter:
+
+    # Create struct for filter type
+    def applyFilter(
+        imgSet,
+        filterType,
+        kernelSizeX=5,
+        kernelSizeY=5,
+        kSize=5,
+        sigmaX=0,
+        sigmaY=0,
+        d=9,
+        sigmaColor=75,
+        sigmaSpace=75,
+        h=10,
+        searchWindowSize=20,
+    ):
+
+        # Check imgSet Instance
+        if not isinstance(imgSet, list):
+            if filterType == 1:  # Average Filter
+                return cv2.blur(imgSet, (kernelSizeX, kernelSizeY))
+            elif filterType == 2:  # Box Filter
+                return cv2.boxFilter(imgSet, -1, (kernelSizeX, kernelSizeY))
+            elif filterType == 3:  # Gaussian Filter
+                return cv2.GaussianBlur(
+                    imgSet, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY
+                )
+            elif filterType == 4:  # Median Filter
+                return cv2.medianBlur(imgSet, kSize)
+            elif filterType == 5:  # Bilateral Filter
+                return cv2.bilateralFilter(imgSet, d, sigmaColor, sigmaSpace)
+            elif filterType == 6:  # Non-Local Means Filter
+                return cv2.fastNlMeansDenoising(imgSet, None, h, searchWindowSize)
+            elif filterType == 7:  # Custom Kernel Filter
+                kernel = np.ones((kSize, kSize), np.float32) / (kSize * kSize)
+                return cv2.filter2D(imgSet, -1, kernel)
+            else:
+                print("Error: Filter type not found")
+                return None
+        else:
+            if filterType == 1:  # Average Filter
+                return [cv2.blur(img, (kernelSizeX, kernelSizeY)) for img in imgSet]
+            elif filterType == 2:  # Box Filter
+                return [
+                    cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet
+                ]
+            elif filterType == 3:  # Gaussian Filter
+                return [
+                    cv2.GaussianBlur(
+                        img, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY
+                    )
+                    for img in imgSet
+                ]
+            elif filterType == 4:  # Median Filter
+                return [cv2.medianBlur(img, kSize) for img in imgSet]
+            elif filterType == 5:  # Bilateral Filter
+                return [
+                    cv2.bilateralFilter(img, d, sigmaColor, sigmaSpace)
+                    for img in imgSet
+                ]
+            elif filterType == 6:  # Non-Local Means Filter
+                return [
+                    cv2.fastNlMeansDenoising(img, None, h, searchWindowSize)
+                    for img in imgSet
+                ]
+            elif filterType == 7:  # Custom Kernel Filter
+                kernel = np.ones((kSize, kSize), np.float32) / (kSize * kSize)
+                return [cv2.filter2D(img, -1, kernel) for img in imgSet]
+            else:
+                print("Error: Filter type not found")
+                return None
 
     def applyAverageFilter(imgSet, kernelSizeX=5, kernelSizeY=5):
         # Check if image is array or not
