@@ -5,35 +5,50 @@ import cv2
 newWidth = 1000
 newHeight = 1000
 scaleFactor = 0.0908
-filterKernelSize = 3 # Value must be odd number and greater than 1
-img = 0
+filterKernelSize = 5  # Value must be odd number and greater than 1
+img = 2
+saveNewImage = False
 
 # Set Image path in array
 pathRawImage = [
-    "raw image/raw image 1.NEF",
-    "raw image/raw image 2.NEF",
-    "raw image/raw image 3.NEF",
-    "raw image/raw image 4.NEF",
+    "img/raw_v_1.NEF",
+    "img/raw_v_2.NEF",
+    "img/raw_v_3.NEF",
+    "img/raw_v_4.NEF",
+    "img/raw_h_1.NEF",
+    "img/raw_h_2.NEF",
+    "img/raw_h_3.NEF",
+    "img/raw_h_4.NEF",
 ]
 
 pathGTIGrayScaled = [
-    "ground truth image/GTI Gray Scaled 1.tiff",
-    "ground truth image/GTI Gray Scaled 2.tiff",
-    "ground truth image/GTI Gray Scaled 3.tiff",
-    "ground truth image/GTI Gray Scaled 4.tiff",
+    "img/gti_gray_v_1.tiff",
+    "img/gti_gray_v_2.tiff",
+    "img/gti_gray_v_3.tiff",
+    "img/gti_gray_v_4.tiff",
+    "img/gti_gray_h_1.tiff",
+    "img/gti_gray_h_2.tiff",
+    "img/gti_gray_h_3.tiff",
+    "img/gti_gray_h_4.tiff",
 ]
 
 pathGTIRGBScaled = [
-    "ground truth image/GTI Scaled 1.tiff",
-    "ground truth image/GTI Scaled 2.tiff",
-    "ground truth image/GTI Scaled 3.tiff",
-    "ground truth image/GTI Scaled 4.tiff",
+    "img/gti_rgb_v_1.tiff",
+    "img/gti_rgb_v_2.tiff",
+    "img/gti_rgb_v_3.tiff",
+    "img/gti_rgb_v_4.tiff",
+    "img/gti_rgb_h_1.tiff",
+    "img/gti_rgb_h_2.tiff",
+    "img/gti_rgb_h_3.tiff",
+    "img/gti_rgb_h_4.tiff",
 ]
 
 # Set Canny parameters
 cannyParamSet = [
-    {"tresh1": 25, "tresh2": 200, "apertureSize": 3, "L2gradient": True},
-    {"tresh1": 100, "tresh2": 150, "apertureSize": 3, "L2gradient": True},
+    {"tresh1": 100, "tresh2": 200, "apertureSize": 3, "L2gradient": True},  #
+    {"tresh1": 100, "tresh2": 200, "apertureSize": 3, "L2gradient": False},  #
+    {"tresh1": 100, "tresh2": 200, "apertureSize": 5, "L2gradient": True},  #
+    {"tresh1": 100, "tresh2": 200, "apertureSize": 5, "L2gradient": False},  #
 ]
 
 # Step 1: Reading RAW Image and converting to BGR for OpenCV (Read RAW Image) ===============================
@@ -47,8 +62,13 @@ scaledRaw2GraySet = f.Image.scaleSetBy(raw2GraySet, scaleFactor)
 scaledRawSet = f.Image.scaleSetBy(rawSet, scaleFactor)
 
 # Save the processed image object to tagged image file TIFF as ground truth image
-f.Image.saveSet(scaledRaw2GraySet, pathGTIGrayScaled)
-f.Image.saveSet(scaledRawSet, pathGTIRGBScaled)
+if saveNewImage:
+    f.Image.saveSet(
+        scaledRaw2GraySet, pathGTIGrayScaled
+    )  # -------------------------------------------------------------------------------------------------------------------------- SAVE
+    f.Image.saveSet(
+        scaledRawSet, pathGTIRGBScaled
+    )  # -------------------------------------------------------------------------------------------------------------------------- SAVE
 
 # Read the saved ground truth image
 gtiGraySet = f.Image.readSet(pathGTIGrayScaled)
@@ -70,7 +90,9 @@ sfAverageRGBSet = f.SmoothFilter.applyAverageFilter(
 sfBoxGraySet = f.SmoothFilter.applyBoxFilter(
     gtiGraySet, filterKernelSize, filterKernelSize
 )
-sfBoxRGBSet = f.SmoothFilter.applyBoxFilter(gtiRGBSet, filterKernelSize, filterKernelSize)
+sfBoxRGBSet = f.SmoothFilter.applyBoxFilter(
+    gtiRGBSet, filterKernelSize, filterKernelSize
+)
 
 # 3. Gaussian filter
 sfGaussianGraySet = f.SmoothFilter.applyGaussianBlurFilter(
@@ -93,7 +115,9 @@ sfNlMeanGraySet = f.SmoothFilter.applyNonLocalMeansFilter(gtiGraySet, 10, 20)
 sfNlMeanRGBSet = f.SmoothFilter.applyNonLocalMeansFilter(gtiRGBSet, 10, 20)
 
 # 7. Custom kernel filter
-sfCustKernelGraySet = f.SmoothFilter.applyCustomKernelFilter(gtiGraySet, filterKernelSize)
+sfCustKernelGraySet = f.SmoothFilter.applyCustomKernelFilter(
+    gtiGraySet, filterKernelSize
+)
 sfCustKernelRGBSet = f.SmoothFilter.applyCustomKernelFilter(gtiRGBSet, filterKernelSize)
 
 # Compile all filtered set
@@ -150,7 +174,7 @@ sf6CannyRGBSet = f.EdgeFilter.applyCanny(sfNlMeanRGBSet, cannyParamSet)
 sf7CannyGraySet = f.EdgeFilter.applyCanny(sfCustKernelGraySet, cannyParamSet)
 sf7CannyRGBSet = f.EdgeFilter.applyCanny(sfCustKernelRGBSet, cannyParamSet)
 
-# Step 4 Compute Peak Signal-to-Noise Ratio (PSNR), compression ratio =======================================
+# Step 5: Compute Peak Signal-to-Noise Ratio (PSNR), compression ratio =======================================
 
 # psnr = [
 #     Compute.peakSignalToNoiseRatio(groundTruthImageSet, imgSet, 2)
