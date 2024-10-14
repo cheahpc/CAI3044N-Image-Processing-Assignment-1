@@ -180,8 +180,7 @@ class Image:
             return None
         else:
             for i in range(len(imgSet)):
-                fileName = pathRawImage[i].split("/")[-1]
-                cv2.imshow(name + str(i + 1) + ': "' + fileName + '"', imgSet[i])
+                cv2.imshow(name + str(i + 1), imgSet[i])
 
 
 # Smooth Filter +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -281,13 +280,13 @@ class SmoothFilter:
                 cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet
             ]
 
-    def applyGaussianBlurFilter(imgSet, kernelSizeX=5, kernelSizeY=5):
+    def applyGaussianBlurFilter(imgSet, kernelSizeX=5, kernelSizeY=5, sigmaX=0, sigmaY=0):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            return cv2.GaussianBlur(imgSet, (kernelSizeX, kernelSizeY), 0)
+            return cv2.GaussianBlur(imgSet, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY)
         else:
             return [
-                cv2.GaussianBlur(img, (kernelSizeX, kernelSizeY), 0) for img in imgSet
+                cv2.GaussianBlur(img, (kernelSizeX, kernelSizeY), sigmaX =sigmaX, sigmaY = sigmaY) for img in imgSet
             ]
 
     def applyMedianBlurFilter(imgSet, kernelSize=5):

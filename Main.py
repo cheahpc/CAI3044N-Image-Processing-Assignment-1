@@ -36,7 +36,7 @@ SMOOTH_SEARCH_WINDOW_SIZE = 20  # For non-local means filter
 EDGEFILTERTYPE = 1
 
 # Set Image path in array
-IMG_NO = 3
+IMG_NO = 2
 pathRawImage = [
     "img/raw_v_1.NEF",
     "img/raw_v_2.NEF",
@@ -104,46 +104,52 @@ gtiGraySet = f.Image.readSet(pathGTIGrayScaled)
 gtiRGBSet = f.Image.readSet(pathGTIRGBScaled)
 
 # Step 3: Apply blur Smooth Filter ========================================================================
-sfGraySet = f.SmoothFilter.applyFilter(
-    gtiGraySet,
-    SMOOTH_TYPE,
-    SMOOTH_KERNEL_SIZE_X,
-    SMOOTH_KERNEL_SIZE_Y,
-    SMOOTH_KERNEL_SIZE,
-    SMOOTH_SIGMA_X,
-    SMOOTH_SIGMA_Y,
-    SMOOTH_D,
-    SMOOTH_SIGMA_COLOR,
-    SMOOTH_SIGMA_SPACE,
-    SMOOTH_H,
-    SMOOTH_SEARCH_WINDOW_SIZE,
+# sfGray = f.SmoothFilter.applyFilter(
+#     gtiGraySet[IMG_NO],
+#     SMOOTH_TYPE,
+#     SMOOTH_KERNEL_SIZE_X,
+#     SMOOTH_KERNEL_SIZE_Y,
+#     SMOOTH_KERNEL_SIZE,
+#     SMOOTH_SIGMA_X,
+#     SMOOTH_SIGMA_Y,
+#     SMOOTH_D,
+#     SMOOTH_SIGMA_COLOR,
+#     SMOOTH_SIGMA_SPACE,
+#     SMOOTH_H,
+#     SMOOTH_SEARCH_WINDOW_SIZE,
+# )
+# sfRGB = f.SmoothFilter.applyFilter(
+#     gtiRGBSet[IMG_NO],
+#     SMOOTH_TYPE,
+#     SMOOTH_KERNEL_SIZE_X,
+#     SMOOTH_KERNEL_SIZE_Y,
+#     SMOOTH_KERNEL_SIZE,
+#     SMOOTH_SIGMA_X,
+#     SMOOTH_SIGMA_Y,
+#     SMOOTH_D,
+#     SMOOTH_SIGMA_COLOR,
+#     SMOOTH_SIGMA_SPACE,
+#     SMOOTH_H,
+#     SMOOTH_SEARCH_WINDOW_SIZE,
+# )
+
+sfAverageRGB = f.SmoothFilter.applyAverageFilter(
+    gtiRGBSet[IMG_NO], SMOOTH_KERNEL_SIZE_X, SMOOTH_KERNEL_SIZE_Y
 )
-sfRGBSet = f.SmoothFilter.applyFilter(
-    gtiRGBSet,
-    SMOOTH_TYPE,
-    SMOOTH_KERNEL_SIZE_X,
-    SMOOTH_KERNEL_SIZE_Y,
-    SMOOTH_KERNEL_SIZE,
-    SMOOTH_SIGMA_X,
-    SMOOTH_SIGMA_Y,
-    SMOOTH_D,
-    SMOOTH_SIGMA_COLOR,
-    SMOOTH_SIGMA_SPACE,
-    SMOOTH_H,
-    SMOOTH_SEARCH_WINDOW_SIZE,
-)
-# sfGraySet = f.Converter.gray2bgr(sfGraySet)
-# sfGraySet = f.Converter.gray2rgb(sfGraySet)
-# sfGraySet = f.Converter.bgr2gray(sfGraySet)
-# sfGraySet = f.Converter.gray2bgr(sfGraySet)
+sfGaussianRGB1 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGBSet[IMG_NO], 3, 3, 0, 0)
+sfGaussianRGB2 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGBSet[IMG_NO], 11, 11, 0, 0)
+sfGaussianRGB3 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGBSet[IMG_NO], 3, 3, 25, 25)
+sfBilateralRGB1 = f.SmoothFilter.applyBilateralFilter(gtiRGBSet[IMG_NO], 9, 100, 100)
+sfBilateralRGB2 = f.SmoothFilter.applyBilateralFilter(gtiRGBSet[IMG_NO], 11, 75, 75)
+
 
 # Step 4: Apply Edge Filter ===============================================================================
-# 1. Canny edge detection | sf1CannySet[i][j] = i-th image, j-th Canny parameter
-# A. Without smoothing
-cannySFGraySet = f.EdgeFilter.applyCanny(sfGraySet, cannyParamSet)
-cannySFRGBSet = f.EdgeFilter.applyCanny(sfRGBSet, cannyParamSet)
-cannyGraySet = f.EdgeFilter.applyCanny(gtiGraySet, cannyParamSet)
-cannyRGBSet = f.EdgeFilter.applyCanny(gtiRGBSet, cannyParamSet)
+# cannySFGraySet = f.EdgeFilter.applyCanny(sfGraySet, cannyParamSet)
+# cannySFRGBSet = f.EdgeFilter.applyCanny(sfRGBSet, cannyParamSet)
+# cannyGraySet = f.EdgeFilter.applyCanny(gtiGraySet, cannyParamSet)
+# cannyRGBSet = f.EdgeFilter.applyCanny(gtiRGBSet, cannyParamSet)
+canny1 = f.EdgeFilter.applyCanny(sfBilateralRGB1, cannyParamSet[0])
+canny2 = f.EdgeFilter.applyCanny(sfBilateralRGB2, cannyParamSet[0])
 
 # Step 5: Compute Peak Signal-to-Noise Ratio (PSNR), compression ratio ======================================
 # psnr = [
@@ -154,27 +160,30 @@ cannyRGBSet = f.EdgeFilter.applyCanny(gtiRGBSet, cannyParamSet)
 # cr = [Compute.compressionRatio(groundTruthImageSet, imgSet, 2) for imgSet in sfFullSet]
 
 # Step 6: Output the results ===============================================================================+
-set1 = cannyGraySet[IMG_NO]
-set2 = cannySFGraySet[IMG_NO]
-set3 = cannyRGBSet[IMG_NO]
-set4 = cannySFRGBSet[IMG_NO]
+
+# For Smooth Filter ---------------------------------------------------------------------
+set1 = [sfBilateralRGB1, canny1, sfBilateralRGB2, canny2]
+# set1 = cannyGraySet[IMG_NO]
+# set2 = cannySFGraySet[IMG_NO]
+# set3 = cannyRGBSet[IMG_NO]
+# set4 = cannySFRGBSet[IMG_NO]
 
 # Add reference image to the set
-set1.insert(0, gtiGraySet[IMG_NO])
-set2.insert(0, sfGraySet[IMG_NO])
-set3.insert(0, gtiRGBSet[IMG_NO])
-set4.insert(0, sfRGBSet[IMG_NO])
+# set1.insert(0, gtiGraySet[IMG_NO])
+# set2.insert(0, sfGraySet[IMG_NO])
+# set3.insert(0, gtiRGBSet[IMG_NO])
+# set4.insert(0, sfRGBSet[IMG_NO])
 
 set1 = f.Image.concatSet(set1, axis=1)
-set2 = f.Image.concatSet(set2, axis=1)
-set3 = f.Image.concatSet(set3, axis=1)
-set4 = f.Image.concatSet(set4, axis=1)
+# set2 = f.Image.concatSet(set2, axis=1)
+# set3 = f.Image.concatSet(set3, axis=1)
+# set4 = f.Image.concatSet(set4, axis=1)
 
-sideBySideA = f.Image.concat(set1, set3, axis=0)
-sideBySideB = f.Image.concat(set2, set4, axis=0)
-sideBySide = f.Image.concat(sideBySideA, sideBySideB, axis=0)
+# sideBySideA = f.Image.concat(set1, set3, axis=0)
+# sideBySideB = f.Image.concat(set2, set4, axis=0)
+# sideBySide = f.Image.concat(sideBySideA, sideBySideB, axis=0)
 
-f.Image.showSet(sideBySide, "Filter")
+f.Image.showSet(set1, "Smooth Filter")
 
 
 cv2.waitKey(0)
