@@ -5,16 +5,43 @@ import rawpy
 
 # Converter +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class Converter:
-    # Enumerate
-    RAW2BGR: int
-    RGB2GRAY: int
-    RGB2BGR: int
-    BGR2GRAY: int
-    BGR2RGB: int
-    GRAY2BGR: int
-    GRAY2RGB: int
 
-    # Convert Raw to BGR
+    def getRedChannel(imgSet):
+        # Check if image is array or not
+        if not isinstance(imgSet, list):
+            imgSet[:, :, 1] = 0
+            imgSet[:, :, 2] = 0
+            return imgSet
+        else:
+            for i in range(len(imgSet)):
+                imgSet[i][:, :, 1] = 0
+                imgSet[i][:, :, 2] = 0
+            return imgSet
+
+    def getGreenChannel(imgSet):
+        # Check if image is array or not
+        if not isinstance(imgSet, list):
+            imgSet[:, :, 0] = 0
+            imgSet[:, :, 2] = 0
+            return imgSet
+        else:
+            for i in range(len(imgSet)):
+                imgSet[i][:, :, 0] = 0
+                imgSet[i][:, :, 2] = 0
+            return imgSet
+
+    def getBlueChannel(imgSet):
+        # Check if image is array or not
+        if not isinstance(imgSet, list):
+            imgSet[:, :, 0] = 0
+            imgSet[:, :, 1] = 0
+            return imgSet
+        else:
+            for i in range(len(imgSet)):
+                imgSet[i][:, :, 0] = 0
+                imgSet[i][:, :, 1] = 0
+            return imgSet
+
     def raw2bgr(imgSet, cameraWB=True):
         # Check if image is array or not
         if not isinstance(imgSet, list):
@@ -77,24 +104,31 @@ class Converter:
 # Manipulate image ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class Image:
     # Read image set
-    def readSet(imgSet):
+    def readSet(imgSet, gray=False):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            return cv2.imread(imgSet)
+            return cv2.imread(imgSet) if not gray else cv2.imread(imgSet, cv2.IMREAD_GRAYSCALE)
         else:
-            return [cv2.imread(img) for img in imgSet]
+            return [cv2.imread(img) for img in imgSet] if not gray else [cv2.imread(img, cv2.IMREAD_GRAYSCALE) for img in imgSet]
 
     # Save image to TIFF
-    def saveSet(imgSet, fileName):
+    def saveSet(imgSet, fileName, singleChannel=False):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            cv2.imwrite(fileName, imgSet)
+            cv2.imwrite(fileName[0], imgSet)
         elif len(imgSet) != len(fileName):
             print("Error: Image length mismatch")
         else:
             for i in range(len(imgSet)):
-                cv2.imwrite(fileName[i], imgSet[i])
+                cv2.imwrite(fileName[i], imgSet[i]) 
         return None
+
+    def getImageType(imgSet):
+        # Check if image is array or not
+        if not isinstance(imgSet, list):
+            return imgSet.dtype
+        else:
+            return [img.dtype for img in imgSet]
 
     # Scale images
     def scaleSetBy(imgSet, scaleFactor=0.1):
@@ -102,33 +136,21 @@ class Image:
         if not isinstance(imgSet, list):
             return cv2.resize(imgSet, None, fx=scaleFactor, fy=scaleFactor)
         else:
-            return [
-                cv2.resize(img, None, fx=scaleFactor, fy=scaleFactor) for img in imgSet
-            ]
+            return [cv2.resize(img, None, fx=scaleFactor, fy=scaleFactor) for img in imgSet]
 
     def scaleSetToHeight(imgSet, height):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            return cv2.resize(
-                imgSet, (int(imgSet.shape[1] * height / imgSet.shape[0]), height)
-            )
+            return cv2.resize(imgSet, (int(imgSet.shape[1] * height / imgSet.shape[0]), height))
         else:
-            return [
-                cv2.resize(img, (int(img.shape[1] * height / img.shape[0]), height))
-                for img in imgSet
-            ]
+            return [cv2.resize(img, (int(img.shape[1] * height / img.shape[0]), height)) for img in imgSet]
 
     def scaleSetToWidth(imgSet, width):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            return cv2.resize(
-                imgSet, (width, int(imgSet.shape[0] * width / imgSet.shape[1]))
-            )
+            return cv2.resize(imgSet, (width, int(imgSet.shape[0] * width / imgSet.shape[1])))
         else:
-            return [
-                cv2.resize(img, (width, int(img.shape[0] * width / img.shape[1])))
-                for img in imgSet
-            ]
+            return [cv2.resize(img, (width, int(img.shape[0] * width / img.shape[1]))) for img in imgSet]
 
     # Concatenate images
     def concat(img1, img2, axis=1):
@@ -165,7 +187,7 @@ class Image:
             for i in range(len(imgSet)):
                 if len(imgSet[i].shape) == 2:
                     imgSet[i] = cv2.cvtColor(imgSet[i], cv2.COLOR_GRAY2BGR)
-                    
+
             # Concatenate all images in the set
             return np.concatenate(imgSet, axis=axis)
 
@@ -216,9 +238,7 @@ class SmoothFilter:
             elif filterType == 2:  # Box Filter
                 return cv2.boxFilter(imgSet, -1, (kernelSizeX, kernelSizeY))
             elif filterType == 3:  # Gaussian Filter
-                return cv2.GaussianBlur(
-                    imgSet, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY
-                )
+                return cv2.GaussianBlur(imgSet, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY)
             elif filterType == 4:  # Median Filter
                 return cv2.medianBlur(imgSet, kSize)
             elif filterType == 5:  # Bilateral Filter
@@ -235,28 +255,15 @@ class SmoothFilter:
             if filterType == 1:  # Average Filter
                 return [cv2.blur(img, (kernelSizeX, kernelSizeY)) for img in imgSet]
             elif filterType == 2:  # Box Filter
-                return [
-                    cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet
-                ]
+                return [cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet]
             elif filterType == 3:  # Gaussian Filter
-                return [
-                    cv2.GaussianBlur(
-                        img, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY
-                    )
-                    for img in imgSet
-                ]
+                return [cv2.GaussianBlur(img, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY) for img in imgSet]
             elif filterType == 4:  # Median Filter
                 return [cv2.medianBlur(img, kSize) for img in imgSet]
             elif filterType == 5:  # Bilateral Filter
-                return [
-                    cv2.bilateralFilter(img, d, sigmaColor, sigmaSpace)
-                    for img in imgSet
-                ]
+                return [cv2.bilateralFilter(img, d, sigmaColor, sigmaSpace) for img in imgSet]
             elif filterType == 6:  # Non-Local Means Filter
-                return [
-                    cv2.fastNlMeansDenoising(img, None, h, searchWindowSize)
-                    for img in imgSet
-                ]
+                return [cv2.fastNlMeansDenoising(img, None, h, searchWindowSize) for img in imgSet]
             elif filterType == 7:  # Custom Kernel Filter
                 kernel = np.ones((kSize, kSize), np.float32) / (kSize * kSize)
                 return [cv2.filter2D(img, -1, kernel) for img in imgSet]
@@ -276,18 +283,14 @@ class SmoothFilter:
         if not isinstance(imgSet, list):
             return cv2.boxFilter(imgSet, -1, (kernelSizeX, kernelSizeY))
         else:
-            return [
-                cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet
-            ]
+            return [cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet]
 
     def applyGaussianBlurFilter(imgSet, kernelSizeX=5, kernelSizeY=5, sigmaX=0, sigmaY=0):
         # Check if image is array or not
         if not isinstance(imgSet, list):
             return cv2.GaussianBlur(imgSet, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY)
         else:
-            return [
-                cv2.GaussianBlur(img, (kernelSizeX, kernelSizeY), sigmaX =sigmaX, sigmaY = sigmaY) for img in imgSet
-            ]
+            return [cv2.GaussianBlur(img, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY) for img in imgSet]
 
     def applyMedianBlurFilter(imgSet, kernelSize=5):
         # Check if image is array or not
@@ -301,19 +304,14 @@ class SmoothFilter:
         if not isinstance(imgSet, list):
             return cv2.bilateralFilter(imgSet, d, sigmaColor, sigmaSpace)
         else:
-            return [
-                cv2.bilateralFilter(img, d, sigmaColor, sigmaSpace) for img in imgSet
-            ]
+            return [cv2.bilateralFilter(img, d, sigmaColor, sigmaSpace) for img in imgSet]
 
     def applyNonLocalMeansFilter(imgSet, h=10, searchWindowSize=20):
         # Check if image is array or not
         if not isinstance(imgSet, list):
             return cv2.fastNlMeansDenoising(imgSet, None, h, searchWindowSize)
         else:
-            return [
-                cv2.fastNlMeansDenoising(img, None, h, searchWindowSize)
-                for img in imgSet
-            ]
+            return [cv2.fastNlMeansDenoising(img, None, h, searchWindowSize) for img in imgSet]
 
     def applyCustomKernelFilter(imgSet, kSize):
         kernel = np.ones((kSize, kSize), np.float32) / (kSize * kSize)
@@ -326,16 +324,12 @@ class SmoothFilter:
 
 # Edge Detection Filter ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # 1. Canny Edge Detection
-# 2. Sobel Edge Detection
-# 3. Laplacian Edge Detection
-# 4. Scharr Edge Detection
-# 5. Prewitt Edge Detection
+# 2. Laplacian Edge Detection
 class EdgeFilter:
     def applyCanny(imgSet, CannyParam):
         # Threshold 1 and 2 are used to detect strong and weak edges(minVal = 0, maxVal = 255)
         # ApertureSize is the size of Sobel kernel used to find image gradients
         # L2gradient is a flag to specify the equation for finding gradient magnitude
-        # Check if image is array or not
 
         cannySet = []
         if not isinstance(imgSet, list):
@@ -349,6 +343,27 @@ class EdgeFilter:
                         L2gradient=CannyParam[j]["L2gradient"],
                     )
                 )
+        elif not isinstance(CannyParam, list):
+            for i in range(len(imgSet)):
+                cannySet.append(
+                    cv2.Canny(
+                        imgSet[i],
+                        CannyParam["tresh1"],
+                        CannyParam["tresh2"],
+                        apertureSize=CannyParam["apertureSize"],
+                        L2gradient=CannyParam["L2gradient"],
+                    )
+                )
+        elif not isinstance(imgSet, list) and not isinstance(CannyParam, list):
+            cannySet.append(
+                cv2.Canny(
+                    imgSet,
+                    CannyParam["tresh1"],
+                    CannyParam["tresh2"],
+                    apertureSize=CannyParam["apertureSize"],
+                    L2gradient=CannyParam["L2gradient"],
+                )
+            )
         else:
             for i in range(len(imgSet)):
                 cannySet.append([])
@@ -364,6 +379,13 @@ class EdgeFilter:
                     )
 
         return cannySet
+
+    def applyLaplacian(imgSet):
+        # Check if image is array or not
+        if not isinstance(imgSet, list):
+            return cv2.Laplacian(imgSet, cv2.CV_64F)
+        else:
+            return [cv2.Laplacian(img, cv2.CV_64F) for img in imgSet]
 
 
 class Compute:
@@ -390,14 +412,7 @@ class Compute:
             print("PSNR: " + "imgSetA" + " | " + "imgSetB" + " = " + str(psnr))
         else:
             for i in range(len(psnr)):
-                print(
-                    "PSNR: "
-                    + imgSetA[i].split("/")[-1]
-                    + " | "
-                    + imgSetB[i].split("/")[-1]
-                    + " = "
-                    + str(psnr[i])
-                )
+                print("PSNR: " + imgSetA[i].split("/")[-1] + " | " + imgSetB[i].split("/")[-1] + " = " + str(psnr[i]))
 
     def compressionRatio(img1, img2, decimal=4):
         # Check if image is array or not
@@ -422,11 +437,4 @@ class Compute:
             print("CR: " + "imgSetA" + " | " + "imgSetB" + " = " + str(cr))
         else:
             for i in range(len(cr)):
-                print(
-                    "CR: "
-                    + imgSetA[i].split("/")[-1]
-                    + " | "
-                    + imgSetB[i].split("/")[-1]
-                    + " = "
-                    + str(cr[i])
-                )
+                print("CR: " + imgSetA[i].split("/")[-1] + " | " + imgSetB[i].split("/")[-1] + " = " + str(cr[i]))

@@ -1,3 +1,4 @@
 {
-	"cSpell.words": ["imshow"]
+	"cSpell.words": ["imshow"],
+	"black-formatter.args": ["--line-length", "250"]
 }

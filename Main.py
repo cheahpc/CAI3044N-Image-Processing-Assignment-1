@@ -2,9 +2,11 @@ import func as f
 import cv2
 
 # Settings
-SCALE_FACTOR = 0.0908
-
+IMG_NO = 2
+READ_SET = False
 SAVE_NEW_IMAGE = False
+
+SCALE_FACTOR = 0.15
 
 # 1. Average filter
 # 2. Box filter
@@ -26,17 +28,6 @@ SMOOTH_SIGMA_SPACE = 75  # For bilateral filter
 SMOOTH_H = 10  # For non-local means filter
 SMOOTH_SEARCH_WINDOW_SIZE = 20  # For non-local means filter
 
-# 1. Canny
-# 2. Sobel
-# 3. Scharr
-# 4. Laplacian
-# 5. Prewitt
-# 6. Roberts
-# 7. Custom kernel filter
-EDGEFILTERTYPE = 1
-
-# Set Image path in array
-IMG_NO = 2
 pathRawImage = [
     "img/raw_v_1.NEF",
     "img/raw_v_2.NEF",
@@ -49,14 +40,14 @@ pathRawImage = [
 ]
 
 pathGTIGrayScaled = [
-    "img/gti_gray_v_1.tiff",
-    "img/gti_gray_v_2.tiff",
-    "img/gti_gray_v_3.tiff",
-    "img/gti_gray_v_4.tiff",
-    "img/gti_gray_h_1.tiff",
-    "img/gti_gray_h_2.tiff",
-    "img/gti_gray_h_3.tiff",
-    "img/gti_gray_h_4.tiff",
+    "img/gti_gray_v_1.TIFF",
+    "img/gti_gray_v_2.TIFF",
+    "img/gti_gray_v_3.TIFF",
+    "img/gti_gray_v_4.TIFF",
+    "img/gti_gray_h_1.TIFF",
+    "img/gti_gray_h_2.TIFF",
+    "img/gti_gray_h_3.TIFF",
+    "img/gti_gray_h_4.TIFF",
 ]
 
 pathGTIRGBScaled = [
@@ -70,7 +61,7 @@ pathGTIRGBScaled = [
     "img/gti_rgb_h_4.tiff",
 ]
 
-# Set Canny parameters
+# Canny parameters
 cannyParamSet = [
     {"tresh1": 100, "tresh2": 200, "apertureSize": 3, "L2gradient": True},  #
     {"tresh1": 100, "tresh2": 200, "apertureSize": 3, "L2gradient": False},  #
@@ -78,76 +69,68 @@ cannyParamSet = [
     {"tresh1": 100, "tresh2": 200, "apertureSize": 5, "L2gradient": False},  #
 ]
 
+# Laplacian parameters
+laplacianParamSet = [
+    {
+        "ddepth": cv2.CV_16S,
+        "ksize": 3,
+        "scale": 1,
+        "delta": 0,
+        "borderType": cv2.BORDER_DEFAULT,
+    },  #
+    {
+        "ddepth": cv2.CV_16S,
+        "ksize": 3,
+        "scale": 1,
+        "delta": 0,
+        "borderType": cv2.BORDER_DEFAULT,
+    },  #
+]
+
 # =========================================================================================================== MAIN CODE
 
-# Step 1: Reading RAW Image and converting to BGR for OpenCV (Read RAW Image) ===============================
-# # Get Processed Image
-rawSet = f.Converter.raw2bgr(pathRawImage)
+# Step 1: Read RAW Image ====================================================================================
+raw = [f.Converter.raw2bgr(pathRawImage[IMG_NO]), f.Converter.raw2bgr(pathRawImage)][READ_SET]  # 3 channel image, 3 dimension (Height, Width, Channel)
 
+# Step 2: Convert to Gray ===================================================================================
+rawGray = f.Converter.bgr2gray(raw)  # Convert to gray, 1 channel image, 2 dimension (Height, Width)
 
-# Step 2: Pre-process image, create "Ground Truth Image" (Grayscale, Resize, Save) ==========================
-raw2GraySet = f.Converter.bgr2gray(rawSet)  # Convert to gray
-scaledRaw2GraySet = f.Image.scaleSetBy(raw2GraySet, SCALE_FACTOR)  # Scale to new size
-scaledRawSet = f.Image.scaleSetBy(rawSet, SCALE_FACTOR)  # Scale to new size RGB
+# Step 3: Scale the image ===================================================================================
+rawGrayScaled = f.Image.scaleSetBy(rawGray, SCALE_FACTOR)  # 1 channel image, 2 dimension (Height, Width)
+rawScaled = f.Image.scaleSetBy(raw, SCALE_FACTOR)  # Scale to new size RGB
 
-# Save the processed image object to tagged image file TIFF as ground truth image
+# Save as TIFF for GTI (Ground Truth Image)
+# -------------------------------------------------------------------------------------------------------------------------- SAVE
 if SAVE_NEW_IMAGE:
-    f.Image.saveSet(
-        scaledRaw2GraySet, pathGTIGrayScaled
-    )  # -------------------------------------------------------------------------------------------------------------------------- SAVE
-    f.Image.saveSet(
-        scaledRawSet, pathGTIRGBScaled
-    )  # -------------------------------------------------------------------------------------------------------------------------- SAVE
+    f.Image.saveSet(rawGrayScaled, pathGTIGrayScaled, True)
+    f.Image.saveSet(rawScaled, pathGTIRGBScaled)
 
-# Read the ground truth image
-gtiGraySet = f.Image.readSet(pathGTIGrayScaled)
-gtiRGBSet = f.Image.readSet(pathGTIRGBScaled)
+# Step 4: Read GTI Image ====================================================================================
+gtiGray = [f.Image.readSet(pathGTIGrayScaled[IMG_NO], True), f.Image.readSet(pathGTIGrayScaled, True)][READ_SET]
+gtiRGB = [f.Image.readSet(pathGTIRGBScaled[IMG_NO]), f.Image.readSet(pathGTIRGBScaled)][READ_SET]
 
-# Step 3: Apply blur Smooth Filter ========================================================================
-# sfGray = f.SmoothFilter.applyFilter(
-#     gtiGraySet[IMG_NO],
-#     SMOOTH_TYPE,
-#     SMOOTH_KERNEL_SIZE_X,
-#     SMOOTH_KERNEL_SIZE_Y,
-#     SMOOTH_KERNEL_SIZE,
-#     SMOOTH_SIGMA_X,
-#     SMOOTH_SIGMA_Y,
-#     SMOOTH_D,
-#     SMOOTH_SIGMA_COLOR,
-#     SMOOTH_SIGMA_SPACE,
-#     SMOOTH_H,
-#     SMOOTH_SEARCH_WINDOW_SIZE,
-# )
-# sfRGB = f.SmoothFilter.applyFilter(
-#     gtiRGBSet[IMG_NO],
-#     SMOOTH_TYPE,
-#     SMOOTH_KERNEL_SIZE_X,
-#     SMOOTH_KERNEL_SIZE_Y,
-#     SMOOTH_KERNEL_SIZE,
-#     SMOOTH_SIGMA_X,
-#     SMOOTH_SIGMA_Y,
-#     SMOOTH_D,
-#     SMOOTH_SIGMA_COLOR,
-#     SMOOTH_SIGMA_SPACE,
-#     SMOOTH_H,
-#     SMOOTH_SEARCH_WINDOW_SIZE,
-# )
+# Step 5: Apply blur Smooth Filter ========================================================================
+sfAverageRGB = f.SmoothFilter.applyAverageFilter(gtiRGB[IMG_NO], SMOOTH_KERNEL_SIZE_X, SMOOTH_KERNEL_SIZE_Y)
+sfGaussianRGB1 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGB[IMG_NO], 3, 3, 0, 0)
+sfGaussianRGB2 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGB[IMG_NO], 11, 11, 0, 0)
+sfGaussianRGB3 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGB[IMG_NO], 3, 3, 25, 25)
+sfBilateralRGB1 = f.SmoothFilter.applyBilateralFilter(gtiRGB[IMG_NO], 9, 100, 100)
+sfBilateralRGB2 = f.SmoothFilter.applyBilateralFilter(gtiRGB[IMG_NO], 11, 75, 75)
 
-sfAverageRGB = f.SmoothFilter.applyAverageFilter(
-    gtiRGBSet[IMG_NO], SMOOTH_KERNEL_SIZE_X, SMOOTH_KERNEL_SIZE_Y
-)
-sfGaussianRGB1 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGBSet[IMG_NO], 3, 3, 0, 0)
-sfGaussianRGB2 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGBSet[IMG_NO], 11, 11, 0, 0)
-sfGaussianRGB3 = f.SmoothFilter.applyGaussianBlurFilter(gtiRGBSet[IMG_NO], 3, 3, 25, 25)
-sfBilateralRGB1 = f.SmoothFilter.applyBilateralFilter(gtiRGBSet[IMG_NO], 9, 100, 100)
-sfBilateralRGB2 = f.SmoothFilter.applyBilateralFilter(gtiRGBSet[IMG_NO], 11, 75, 75)
+# ----------------------------------------------------------------------------------------------------------- Show
+print("gtiGray image: ", gtiGray.shape, " | ", f.Image.getImageType(gtiGray))
+print("gtiRGB image: ", gtiRGB.shape, " | ", f.Image.getImageType(gtiRGB))
 
+# Show Image
+cv2.imshow("gtiGray", gtiGray)
+cv2.imshow("gtiRGB", gtiRGB)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
-# Step 4: Apply Edge Filter ===============================================================================
-# cannySFGraySet = f.EdgeFilter.applyCanny(sfGraySet, cannyParamSet)
-# cannySFRGBSet = f.EdgeFilter.applyCanny(sfRGBSet, cannyParamSet)
-# cannyGraySet = f.EdgeFilter.applyCanny(gtiGraySet, cannyParamSet)
-# cannyRGBSet = f.EdgeFilter.applyCanny(gtiRGBSet, cannyParamSet)
+exit()
+# ----------------------------------------------------------------------------------------------------------- Show
+
+# Step 6: Apply Edge Filter ===============================================================================
 canny1 = f.EdgeFilter.applyCanny(sfBilateralRGB1, cannyParamSet[0])
 canny2 = f.EdgeFilter.applyCanny(sfBilateralRGB2, cannyParamSet[0])
 
@@ -162,7 +145,7 @@ canny2 = f.EdgeFilter.applyCanny(sfBilateralRGB2, cannyParamSet[0])
 # Step 6: Output the results ===============================================================================+
 
 # For Smooth Filter ---------------------------------------------------------------------
-set1 = [sfBilateralRGB1, canny1, sfBilateralRGB2, canny2]
+# set1 = [sfBilateralRGB1, canny1, sfBilateralRGB2, canny2]
 # set1 = cannyGraySet[IMG_NO]
 # set2 = cannySFGraySet[IMG_NO]
 # set3 = cannyRGBSet[IMG_NO]
@@ -174,7 +157,7 @@ set1 = [sfBilateralRGB1, canny1, sfBilateralRGB2, canny2]
 # set3.insert(0, gtiRGBSet[IMG_NO])
 # set4.insert(0, sfRGBSet[IMG_NO])
 
-set1 = f.Image.concatSet(set1, axis=1)
+# set1 = f.Image.concatSet(set1, axis=1)
 # set2 = f.Image.concatSet(set2, axis=1)
 # set3 = f.Image.concatSet(set3, axis=1)
 # set4 = f.Image.concatSet(set4, axis=1)
@@ -183,7 +166,7 @@ set1 = f.Image.concatSet(set1, axis=1)
 # sideBySideB = f.Image.concat(set2, set4, axis=0)
 # sideBySide = f.Image.concat(sideBySideA, sideBySideB, axis=0)
 
-f.Image.showSet(set1, "Smooth Filter")
+# f.Image.showSet(set1, "Smooth Filter")
 
 
 cv2.waitKey(0)
