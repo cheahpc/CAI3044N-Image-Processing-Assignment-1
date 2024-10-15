@@ -107,20 +107,20 @@ class Image:
     def readSet(imgSet, gray=False):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            return cv2.imread(imgSet) if not gray else cv2.imread(imgSet, cv2.IMREAD_GRAYSCALE)
+            # return cv2.imread(imgSet) if not gray else cv2.imread(imgSet, cv2.IMREAD_GRAYSCALE)
+            return cv2.imread(imgSet) if not gray else cv2.imread(imgSet, 0)
         else:
             return [cv2.imread(img) for img in imgSet] if not gray else [cv2.imread(img, cv2.IMREAD_GRAYSCALE) for img in imgSet]
 
     # Save image to TIFF
-    def saveSet(imgSet, fileName, singleChannel=False):
-        # Check if image is array or not
-        if not isinstance(imgSet, list):
-            cv2.imwrite(fileName[0], imgSet)
+    def saveSet(imgSet, fileName):
+        if not isinstance(imgSet, list) and not isinstance(fileName, list):
+            cv2.imwrite(fileName, imgSet)
         elif len(imgSet) != len(fileName):
             print("Error: Image length mismatch")
         else:
             for i in range(len(imgSet)):
-                cv2.imwrite(fileName[i], imgSet[i]) 
+                cv2.imwrite(fileName[i], imgSet[i])
         return None
 
     def getImageType(imgSet):
@@ -182,13 +182,7 @@ class Image:
         elif len(imgSet) == 0:
             print("Error: Image set is empty")
             return None
-        else:
-            # Make all image in the array with same channel size
-            for i in range(len(imgSet)):
-                if len(imgSet[i].shape) == 2:
-                    imgSet[i] = cv2.cvtColor(imgSet[i], cv2.COLOR_GRAY2BGR)
-
-            # Concatenate all images in the set
+        else:            
             return np.concatenate(imgSet, axis=axis)
 
     # Show all images
@@ -285,12 +279,12 @@ class SmoothFilter:
         else:
             return [cv2.boxFilter(img, -1, (kernelSizeX, kernelSizeY)) for img in imgSet]
 
-    def applyGaussianBlurFilter(imgSet, kernelSizeX=5, kernelSizeY=5, sigmaX=0, sigmaY=0):
+    def applyGaussianBlurFilter(imgSet, kernelSize=5, sigmaX=0, sigmaY=0):
         # Check if image is array or not
         if not isinstance(imgSet, list):
-            return cv2.GaussianBlur(imgSet, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY)
+            return cv2.GaussianBlur(imgSet, (kernelSize,kernelSize), sigmaX=sigmaX, sigmaY=sigmaY)
         else:
-            return [cv2.GaussianBlur(img, (kernelSizeX, kernelSizeY), sigmaX=sigmaX, sigmaY=sigmaY) for img in imgSet]
+            return [cv2.GaussianBlur(img, (kernelSize, kernelSize), sigmaX=sigmaX, sigmaY=sigmaY) for img in imgSet]
 
     def applyMedianBlurFilter(imgSet, kernelSize=5):
         # Check if image is array or not
@@ -389,52 +383,37 @@ class EdgeFilter:
 
 
 class Compute:
-    def peakSignalToNoiseRatio(img1, img2, decimal=4):
+    def peakSignalToNoiseRatio(imgSrc, imgProcessed, decimal=4):
         # Check if image is array or not
-        if not isinstance(img1, list) and not isinstance(img2, list):
-            return cv2.PSNR(img1, img2)
-        elif not isinstance(img1, list) or not isinstance(img2, list):
+        if not isinstance(imgSrc, list) and not isinstance(imgProcessed, list):
+            if imgSrc.size != imgProcessed.size:
+                print("Error: Image size mismatch")
+                return None
+            return cv2.PSNR(imgSrc, imgProcessed)
+        elif not isinstance(imgSrc, list) or not isinstance(imgProcessed, list):
             print("Error: Image type mismatch")
-        elif len(img1) != len(img2):
+        elif len(imgSrc) != len(imgProcessed):
             print("Error: Image length mismatch")
         else:
             # Compute PSNR
-            psnr = [None] * len(img1)
-            for i in range(len(img1)):
-                psnr[i] = round(cv2.PSNR(img1[i], img2[i]), decimal)
+            psnr = [] 
+            for i in range(len(imgSrc)):
+                psnr[i] = round(cv2.PSNR(imgSrc[i], imgProcessed[i]), decimal)
 
             return psnr
         return None
 
-    def psnrToString(psnr, imgSetA, imgSetB):
-        # Check if PSNR is array or not
-        if not isinstance(psnr, list):
-            print("PSNR: " + "imgSetA" + " | " + "imgSetB" + " = " + str(psnr))
-        else:
-            for i in range(len(psnr)):
-                print("PSNR: " + imgSetA[i].split("/")[-1] + " | " + imgSetB[i].split("/")[-1] + " = " + str(psnr[i]))
-
-    def compressionRatio(img1, img2, decimal=4):
+    def compressionRatio(imgSrc, imgProcessed, decimal=4):
         # Check if image is array or not
-        if not isinstance(img1, list) and not isinstance(img2, list):
-            return round((img1.nbytes / img2.nbytes), decimal)
-        elif not isinstance(img1, list) or not isinstance(img2, list):
+        if not isinstance(imgSrc, list) and not isinstance(imgProcessed, list):
+            return round(imgSrc.size / imgProcessed.size, decimal)
+        elif not isinstance(imgSrc, list) or not isinstance(imgProcessed, list):
             print("Error: Image type mismatch")
-        elif len(img1) != len(img2):
+        elif len(imgSrc) != len(imgProcessed):
             print("Error: Image length mismatch")
         else:
             # Compute Compression Ratio
-            cr = [None] * len(img1)
-            for i in range(len(img1)):
-                cr[i] = round((img1[i].nbytes / img2[i].nbytes), decimal)
-
+            cr = []
+            for i in range(len(imgSrc)):
+                cr.append(round((imgSrc[i].size / imgProcessed[i].size), decimal))
             return cr
-        return None
-
-    def crToString(cr, imgSetA, imgSetB):
-        # Check if CR is array or not
-        if not isinstance(cr, list):
-            print("CR: " + "imgSetA" + " | " + "imgSetB" + " = " + str(cr))
-        else:
-            for i in range(len(cr)):
-                print("CR: " + imgSetA[i].split("/")[-1] + " | " + imgSetB[i].split("/")[-1] + " = " + str(cr[i]))
