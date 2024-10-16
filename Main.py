@@ -1,24 +1,80 @@
 import rawpy
 import numpy as np
 import cv2
+import os
 
 # Settings
 SAVE_NEW_GTI = False
+
 SAVE_NEW_SMOOTHED = True
-SAVE_NEW_CANNY = False
-SAVE_NEW_LAPLACIAN = False
+
+SAVE_NEW_CANNY = True
+SAVE_NEW_LAPLACIAN = True
+
 SCALE_FACTOR = 0.25
 
 path_raw_h = "img/raw_h_1.NEF"
 path_raw_v = "img/raw_v_2.NEF"
 
-path_gti_h = "img/gti_h.TIFF"  # Gray Scaled
-path_gti_v = "img/gti_v.TIFF"  # Gray Scaled
+path_gti_h = "img/gti_h.TIFF"
+path_gti_v = "img/gti_v.TIFF"
 
-path_sg_h = "img/sg_h.TIFF"  # Gray Scaled
-path_sg_v = "img/sg_v.TIFF"  # Gray Scaled
-path_sb_h = "img/sb_h.TIFF"  # Gray Scaled
-path_sb_v = "img/sb_v.TIFF"  # Gray Scaled
+path_sg_h = "img/sg_h.TIFF"
+path_sg_h_1 = "img/sg_h_1.TIFF"
+path_sg_h_2 = "img/sg_h_2.TIFF"
+path_sg_h_3 = "img/sg_h_3.TIFF"
+path_sg_v = "img/sg_v.TIFF"
+path_sg_v_1 = "img/sg_v_1.TIFF"
+path_sg_v_2 = "img/sg_v_2.TIFF"
+path_sg_v_3 = "img/sg_v_3.TIFF"
+
+path_sb_h = "img/sb_h.TIFF"
+path_sb_h_1 = "img/sb_h_1.TIFF"
+path_sb_h_2 = "img/sb_h_2.TIFF"
+path_sb_h_3 = "img/sb_h_3.TIFF"
+path_sb_v = "img/sb_v.TIFF"
+path_sb_v_1 = "img/sb_v_1.TIFF"
+path_sb_v_2 = "img/sb_v_2.TIFF"
+path_sb_v_3 = "img/sb_v_3.TIFF"
+
+# Edge Detection
+path_ec_h = "img/ec_h.TIFF"
+path_ec_h_1 = "img/ec_h_1.TIFF"
+path_ec_h_2 = "img/ec_h_2.TIFF"
+path_ec_h_3 = "img/ec_h_3.TIFF"
+path_ec_h_4 = "img/ec_h_4.TIFF"
+path_ec_h_5 = "img/ec_h_5.TIFF"
+path_ec_h_6 = "img/ec_h_6.TIFF"
+path_ec_h_7 = "img/ec_h_7.TIFF"
+path_ec_h_8 = "img/ec_h_8.TIFF"
+path_ec_v = "img/ec_v.TIFF"
+path_ec_v_1 = "img/ec_v_1.TIFF"
+path_ec_v_2 = "img/ec_v_2.TIFF"
+path_ec_v_3 = "img/ec_v_3.TIFF"
+path_ec_v_4 = "img/ec_v_4.TIFF"
+path_ec_v_5 = "img/ec_v_5.TIFF"
+path_ec_v_6 = "img/ec_v_6.TIFF"
+path_ec_v_7 = "img/ec_v_7.TIFF"
+path_ec_v_8 = "img/ec_v_8.TIFF"
+
+path_el_h = "img/el_h.TIFF"
+path_el_h_1 = "img/el_h_1.TIFF"
+path_el_h_2 = "img/el_h_2.TIFF"
+path_el_h_3 = "img/el_h_3.TIFF"
+path_el_h_4 = "img/el_h_4.TIFF"
+path_el_h_5 = "img/el_h_5.TIFF"
+path_el_h_6 = "img/el_h_6.TIFF"
+path_el_h_7 = "img/el_h_7.TIFF"
+path_el_h_8 = "img/el_h_8.TIFF"
+path_el_v = "img/el_v.TIFF"
+path_el_v_1 = "img/el_v_1.TIFF"
+path_el_v_2 = "img/el_v_2.TIFF"
+path_el_v_3 = "img/el_v_3.TIFF"
+path_el_v_4 = "img/el_v_4.TIFF"
+path_el_v_5 = "img/el_v_5.TIFF"
+path_el_v_6 = "img/el_v_6.TIFF"
+path_el_v_7 = "img/el_v_7.TIFF"
+path_el_v_8 = "img/el_v_8.TIFF"
 
 # =========================================================================================================== MAIN CODE
 
@@ -44,7 +100,6 @@ if SAVE_NEW_GTI:
 gti_h = cv2.imread(path_gti_h, 0)  # Read image as gray scaled
 gti_v = cv2.imread(path_gti_v, 0)  # Read image as gray scaled
 
-
 # Step 5: Apply Smooth Filter ===============================================================================
 # Apply Gaussian
 sg_h_1 = cv2.GaussianBlur(gti_h, (3, 3), 0, 0)
@@ -53,7 +108,6 @@ sg_h_3 = cv2.GaussianBlur(gti_h, (7, 7), 0, 0)
 sg_v_1 = cv2.GaussianBlur(gti_v, (3, 3), 0, 0)
 sg_v_2 = cv2.GaussianBlur(gti_v, (5, 5), 0, 0)
 sg_v_3 = cv2.GaussianBlur(gti_v, (7, 7), 0, 0)
-
 
 # Apply Bilateral
 sb_h_1 = cv2.bilateralFilter(gti_h, 3, 75, 75)
@@ -65,60 +119,55 @@ sb_v_3 = cv2.bilateralFilter(gti_v, 7, 75, 75)
 
 # Step 6: Apply Edge Filter ===============================================================================
 # Apply Canny
-# ec_h_1 = cv2.Canny(gti_h,100,200,3, L2gradient=True)
-# canny2 = f.EdgeFilter.applyCanny(gti_v, cannyParamSet[0])
+ec_h_1 = cv2.Canny(sb_h_2, 25, 225)
+ec_h_2 = cv2.Canny(sb_h_2, 50, 200)
+ec_h_3 = cv2.Canny(sb_h_2, 75, 175)
+ec_h_4 = cv2.Canny(sb_h_2, 100, 150)
+ec_h_5 = cv2.Canny(sb_h_2, 25, 150)
+ec_h_6 = cv2.Canny(sb_h_2, 50, 175)
+ec_h_7 = cv2.Canny(sb_h_2, 75, 200)
+ec_h_8 = cv2.Canny(sb_h_2, 100, 225)
 
-# Step 5: Compute Peak Signal-to-Noise Ratio (PSNR) and compression ratio ===================================
-# PSNR - Smoothed Gaussian
-psnr_sg_h_1 = round(cv2.PSNR(gti_h, sg_h_1), 4)
-psnr_sg_h_2 = round(cv2.PSNR(gti_h, sg_h_2), 4)
-psnr_sg_h_3 = round(cv2.PSNR(gti_h, sg_h_3), 4)
-psnr_sg_v_1 = round(cv2.PSNR(gti_v, sg_v_1), 4)
-psnr_sg_v_2 = round(cv2.PSNR(gti_v, sg_v_2), 4)
-psnr_sg_v_3 = round(cv2.PSNR(gti_v, sg_v_3), 4)
+ec_v_1 = cv2.Canny(sb_v_1, 25, 225)
+ec_v_2 = cv2.Canny(sb_v_1, 50, 200)
+ec_v_3 = cv2.Canny(sb_v_1, 75, 175)
+ec_v_4 = cv2.Canny(sb_v_1, 100, 150)
+ec_v_5 = cv2.Canny(sb_v_1, 25, 150)
+ec_v_6 = cv2.Canny(sb_v_1, 50, 175)
+ec_v_7 = cv2.Canny(sb_v_1, 75, 200)
+ec_v_8 = cv2.Canny(sb_v_1, 100, 225)
 
+# Apply Laplacian
+el_h_1 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=1))
+el_h_2 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=3))
+el_h_3 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=5))
+el_h_4 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=7))
+el_v_1 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=1))
+el_v_2 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=3))
+el_v_3 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=5))
+el_v_4 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=7))
 
-# PSNR - Smoothed Bilateral
-psnr_sb_h_1 = round(cv2.PSNR(gti_h, sb_h_1), 4)
-psnr_sb_h_2 = round(cv2.PSNR(gti_h, sb_h_2), 4)
-psnr_sb_h_3 = round(cv2.PSNR(gti_h, sb_h_3), 4)
-psnr_sb_v_1 = round(cv2.PSNR(gti_v, sb_v_1), 4)
-psnr_sb_v_2 = round(cv2.PSNR(gti_v, sb_v_2), 4)
-psnr_sb_v_3 = round(cv2.PSNR(gti_v, sb_v_3), 4)
-
-
-# Compression Ratio - RAW & GTI
-cr_raw_gti_h = round(raw_h.size / gti_h.size, 4)
-cr_raw_gti_v = round(raw_v.size / gti_v.size, 4)
-
-
-# Step 6: Output the results ===============================================================================+
-
-# ----------------------------------------------------------------------------------------------------------- Compilation
-
+# Step 5: Save the images ===================================================================================
+# Smoothed
 sg_h_list = [
-    gti_h,  # Original
     sg_h_1,
     sg_h_2,
     sg_h_3,
 ]
 
 sg_v_list = [
-    gti_v,  # Original
     sg_v_1,
     sg_v_2,
     sg_v_3,
 ]
 
 sb_h_list = [
-    gti_h,  # Original
     sb_h_1,
     sb_h_2,
     sb_h_3,
 ]
 
 sb_v_list = [
-    gti_v,  # Original
     sb_v_1,
     sb_v_2,
     sb_v_3,
@@ -131,11 +180,210 @@ sb_v = np.concatenate(sb_v_list, 1)
 
 if SAVE_NEW_SMOOTHED:
     cv2.imwrite(path_sg_h, sg_h)
+    cv2.imwrite(path_sg_v_1, sg_v_1)
+    cv2.imwrite(path_sg_v_2, sg_v_2)
+    cv2.imwrite(path_sg_v_3, sg_v_3)
     cv2.imwrite(path_sg_v, sg_v)
+    cv2.imwrite(path_sg_h_1, sg_h_1)
+    cv2.imwrite(path_sg_h_2, sg_h_2)
+    cv2.imwrite(path_sg_h_3, sg_h_3)
     cv2.imwrite(path_sb_h, sb_h)
+    cv2.imwrite(path_sb_h_1, sb_h_1)
+    cv2.imwrite(path_sb_h_2, sb_h_2)
+    cv2.imwrite(path_sb_h_3, sb_h_3)
     cv2.imwrite(path_sb_v, sb_v)
+    cv2.imwrite(path_sb_v_1, sb_v_1)
+    cv2.imwrite(path_sb_v_2, sb_v_2)
+    cv2.imwrite(path_sb_v_3, sb_v_3)
+
+# Edge Detection
+ec_h_list_1 = [
+    ec_h_1,
+    ec_h_2,
+    ec_h_3,
+    ec_h_4,
+]
+
+ec_h_list_2 = [
+    ec_h_5,
+    ec_h_6,
+    ec_h_7,
+    ec_h_8,
+]
+
+ec_v_list_1 = [
+    ec_v_1,
+    ec_v_2,
+    ec_v_3,
+    ec_v_4,
+]
+
+ec_v_list_2 = [
+    ec_v_5,
+    ec_v_6,
+    ec_v_7,
+    ec_v_8,
+]
+
+ec_h_a = np.concatenate(ec_h_list_1, 1)
+ec_h_b = np.concatenate(ec_h_list_2, 1)
+ec_h = np.concatenate([ec_h_a, ec_h_b], 0)
+ec_v_a = np.concatenate(ec_v_list_1, 1)
+ec_v_b = np.concatenate(ec_v_list_2, 1)
+ec_v = np.concatenate([ec_v_a, ec_v_b], 0)
 
 
+if SAVE_NEW_CANNY:
+    cv2.imwrite(path_ec_h, ec_h)
+    cv2.imwrite(path_ec_h_1, ec_h_1)
+    cv2.imwrite(path_ec_h_2, ec_h_2)
+    cv2.imwrite(path_ec_h_3, ec_h_3)
+    cv2.imwrite(path_ec_h_4, ec_h_4)
+    cv2.imwrite(path_ec_h_5, ec_h_5)
+    cv2.imwrite(path_ec_h_6, ec_h_6)
+    cv2.imwrite(path_ec_h_7, ec_h_7)
+    cv2.imwrite(path_ec_h_8, ec_h_8)
+    cv2.imwrite(path_ec_v, ec_v)
+    cv2.imwrite(path_ec_v_1, ec_v_1)
+    cv2.imwrite(path_ec_v_2, ec_v_2)
+    cv2.imwrite(path_ec_v_3, ec_v_3)
+    cv2.imwrite(path_ec_v_4, ec_v_4)
+    cv2.imwrite(path_ec_v_5, ec_v_5)
+    cv2.imwrite(path_ec_v_6, ec_v_6)
+    cv2.imwrite(path_ec_v_7, ec_v_7)
+    cv2.imwrite(path_ec_v_8, ec_v_8)
+
+el_h_list = [
+    el_h_1,
+    el_h_2,
+    el_h_3,
+    el_h_4,
+]
+
+el_v_list = [
+    el_v_1,
+    el_v_2,
+    el_v_3,
+    el_v_4,
+]
+
+el_h = np.concatenate(el_h_list, 1)
+el_v = np.concatenate(el_v_list, 1)
+
+if SAVE_NEW_LAPLACIAN:
+    cv2.imwrite(path_el_h, el_h)
+    cv2.imwrite(path_el_h_1, el_h_1)
+    cv2.imwrite(path_el_h_2, el_h_2)
+    cv2.imwrite(path_el_h_3, el_h_3)
+    cv2.imwrite(path_el_h_4, el_h_4)
+    cv2.imwrite(path_el_v, el_v)
+    cv2.imwrite(path_el_v_1, el_v_1)
+    cv2.imwrite(path_el_v_2, el_v_2)
+    cv2.imwrite(path_el_v_3, el_v_3)
+    cv2.imwrite(path_el_v_4, el_v_4)
+
+# Step 6: Compute Peak Signal-to-Noise Ratio (PSNR) and compression ratio ===================================
+# PSNR - Smoothed Gaussian
+psnr_sg_h_1 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_sg_h_1)), 4)
+psnr_sg_h_2 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_sg_h_2)), 4)
+psnr_sg_h_3 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_sg_h_3)), 4)
+psnr_sg_v_1 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_sg_v_1)), 4)
+psnr_sg_v_2 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_sg_v_2)), 4)
+psnr_sg_v_3 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_sg_v_3)), 4)
+
+# PSNR - Smoothed Bilateral
+psnr_sb_h_1 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_sb_h_1)), 4)
+psnr_sb_h_2 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_sb_h_2)), 4)
+psnr_sb_h_3 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_sb_h_3)), 4)
+psnr_sb_v_1 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_sb_v_1)), 4)
+psnr_sb_v_2 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_sb_v_2)), 4)
+psnr_sb_v_3 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_sb_v_3)), 4)
+
+# PSNR - Edge Detection - Canny
+psnr_ec_h_1 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_1)), 4)
+psnr_ec_h_2 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_2)), 4)
+psnr_ec_h_3 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_3)), 4)
+psnr_ec_h_4 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_4)), 4)
+psnr_ec_h_5 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_5)), 4)
+psnr_ec_h_6 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_6)), 4)
+psnr_ec_h_7 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_7)), 4)
+psnr_ec_h_8 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_ec_h_8)), 4)
+psnr_ec_v_1 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_1)), 4)
+psnr_ec_v_2 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_2)), 4)
+psnr_ec_v_3 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_3)), 4)
+psnr_ec_v_4 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_4)), 4)
+psnr_ec_v_5 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_5)), 4)
+psnr_ec_v_6 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_6)), 4)
+psnr_ec_v_7 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_7)), 4)
+psnr_ec_v_8 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_ec_v_8)), 4)
+
+# PSNR - Edge Detection - Laplacian
+# Debug gti_h, el_h_1
+psnr_el_h_1 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_1)), 4)
+psnr_el_h_2 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_2)), 4)
+psnr_el_h_3 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_3)), 4)
+psnr_el_h_4 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_4)), 4)
+psnr_el_v_1 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_1)), 4)
+psnr_el_v_2 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_2)), 4)
+psnr_el_v_3 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_3)), 4)
+psnr_el_v_4 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_4)), 4)
+
+# Compression Ratio - RAW & GTI
+cr_raw_gti_h = round(os.path.getsize(path_raw_h) / os.path.getsize(path_gti_h), 4)
+cr_raw_gti_v = round(os.path.getsize(path_raw_v) / os.path.getsize(path_gti_v), 4)
+
+# Compression Ratio - GTI & Smoothed
+cr_gti_sg_h_1 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_sg_h_1), 4)
+cr_gti_sg_h_2 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_sg_h_2), 4)
+cr_gti_sg_h_3 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_sg_h_3), 4)
+cr_gti_sg_v_1 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_sg_v_1), 4)
+cr_gti_sg_v_2 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_sg_v_2), 4)
+cr_gti_sg_v_3 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_sg_v_3), 4)
+
+cr_gti_sb_h_1 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_sb_h_1), 4)
+cr_gti_sb_h_2 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_sb_h_2), 4)
+cr_gti_sb_h_3 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_sb_h_3), 4)
+cr_gti_sb_v_1 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_sb_v_1), 4)
+cr_gti_sb_v_2 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_sb_v_2), 4)
+cr_gti_sb_v_3 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_sb_v_3), 4)
+
+# Compression Ratio - GTI & Edge Canny
+cr_gti_ec_h_1 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_1), 4)
+cr_gti_ec_h_2 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_2), 4)
+cr_gti_ec_h_3 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_3), 4)
+cr_gti_ec_h_4 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_4), 4)
+cr_gti_ec_h_5 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_5), 4)
+cr_gti_ec_h_6 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_6), 4)
+cr_gti_ec_h_7 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_7), 4)
+cr_gti_ec_h_8 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_8), 4)
+cr_gti_ec_v_1 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_1), 4)
+cr_gti_ec_v_2 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_2), 4)
+cr_gti_ec_v_3 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_3), 4)
+cr_gti_ec_v_4 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_4), 4)
+cr_gti_ec_v_5 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_5), 4)
+cr_gti_ec_v_6 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_6), 4)
+cr_gti_ec_v_7 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_7), 4)
+cr_gti_ec_v_8 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_8), 4)
+
+# Compression Ratio - GTI & Edge Laplacian
+cr_gti_el_h_1 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_1), 4)
+cr_gti_el_h_2 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_2), 4)
+cr_gti_el_h_3 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_3), 4)
+cr_gti_el_h_4 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_4), 4)
+cr_gti_el_h_5 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_5), 4)
+cr_gti_el_h_6 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_6), 4)
+cr_gti_el_h_7 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_7), 4)
+cr_gti_el_h_8 = round(os.path.getsize(path_gti_h) / os.path.getsize(path_ec_h_8), 4)
+cr_gti_el_v_1 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_1), 4)
+cr_gti_el_v_2 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_2), 4)
+cr_gti_el_v_3 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_3), 4)
+cr_gti_el_v_4 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_4), 4)
+cr_gti_el_v_5 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_5), 4)
+cr_gti_el_v_6 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_6), 4)
+cr_gti_el_v_7 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_7), 4)
+cr_gti_el_v_8 = round(os.path.getsize(path_gti_v) / os.path.getsize(path_ec_v_8), 4)
+
+# Step 6: Output the results ===============================================================================+
 # ----------------------------------------------------------------------------------------------------------- Show - Information
 # Information
 print("---------- Informations ----------")
@@ -147,21 +395,55 @@ print()
 # ----------------------------------------------------------------------------------------------------------- Show - PSNR
 print("---------- PSNR ----------")
 # Peak Signal To Noise Ratio - Smoothed
-print("PSNR - GTI X Smoothed - [Gaussian Blur] 1 (Horizontal):", psnr_sg_h_1, " dB")
-print("PSNR - GTI X Smoothed - [Gaussian Blur] 2 (Horizontal):", psnr_sg_h_2, " dB")
-print("PSNR - GTI X Smoothed - [Gaussian Blur] 3 (Horizontal):", psnr_sg_h_3, " dB")
-print("PSNR - GTI X Smoothed - [Gaussian Blur] 1 (Vertical):", psnr_sg_v_1, " dB")
-print("PSNR - GTI X Smoothed - [Gaussian Blur] 2 (Vertical):", psnr_sg_v_2, " dB")
-print("PSNR - GTI X Smoothed - [Gaussian Blur] 3 (Vertical):", psnr_sg_v_3, " dB")
+print("Gaussian Blur")
+print("PSNR - GTI X Gaussian Blur - 1 (Horizontal):", psnr_sg_h_1, " dB")
+print("PSNR - GTI X Gaussian Blur - 2 (Horizontal):", psnr_sg_h_2, " dB")
+print("PSNR - GTI X Gaussian Blur - 3 (Horizontal):", psnr_sg_h_3, " dB")
+print("PSNR - GTI X Gaussian Blur - 1 (Vertical):", psnr_sg_v_1, " dB")
+print("PSNR - GTI X Gaussian Blur - 2 (Vertical):", psnr_sg_v_2, " dB")
+print("PSNR - GTI X Gaussian Blur - 3 (Vertical):", psnr_sg_v_3, " dB")
 print()
 
-print("PSNR - GTI X Smoothed - [Bilateral Filtering] 1 (Horizontal):", psnr_sb_h_1, " dB")
-print("PSNR - GTI X Smoothed - [Bilateral Filtering] 2 (Horizontal):", psnr_sb_h_2, " dB")
-print("PSNR - GTI X Smoothed - [Bilateral Filtering] 3 (Horizontal):", psnr_sb_h_3, " dB")
-print("PSNR - GTI X Smoothed - [Bilateral Filtering] 1 (Vertical):", psnr_sb_v_1, " dB")
-print("PSNR - GTI X Smoothed - [Bilateral Filtering] 2 (Vertical):", psnr_sb_v_2, " dB")
-print("PSNR - GTI X Smoothed - [Bilateral Filtering] 3 (Vertical):", psnr_sb_v_3, " dB")
+print("Bilateral Filtering")
+print("PSNR - GTI X Bilateral Filtering - 1 (Horizontal):", psnr_sb_h_1, " dB")
+print("PSNR - GTI X Bilateral Filtering - 2 (Horizontal):", psnr_sb_h_2, " dB")
+print("PSNR - GTI X Bilateral Filtering - 3 (Horizontal):", psnr_sb_h_3, " dB")
+print("PSNR - GTI X Bilateral Filtering - 1 (Vertical):", psnr_sb_v_1, " dB")
+print("PSNR - GTI X Bilateral Filtering - 2 (Vertical):", psnr_sb_v_2, " dB")
+print("PSNR - GTI X Bilateral Filtering - 3 (Vertical):", psnr_sb_v_3, " dB")
 print()
+
+# Peak Signal To Noise Ratio - Edge Detection - Canny
+print("Canny")
+print("PSNR - GTI X Canny - 1 (Horizontal):", psnr_ec_h_1, " dB")
+print("PSNR - GTI X Canny - 2 (Horizontal):", psnr_ec_h_2, " dB")
+print("PSNR - GTI X Canny - 3 (Horizontal):", psnr_ec_h_3, " dB")
+print("PSNR - GTI X Canny - 4 (Horizontal):", psnr_ec_h_4, " dB")
+print("PSNR - GTI X Canny - 5 (Horizontal):", psnr_ec_h_5, " dB")
+print("PSNR - GTI X Canny - 6 (Horizontal):", psnr_ec_h_6, " dB")
+print("PSNR - GTI X Canny - 7 (Horizontal):", psnr_ec_h_7, " dB")
+print("PSNR - GTI X Canny - 8 (Horizontal):", psnr_ec_h_8, " dB")
+print("PSNR - GTI X Canny - 1 (Vertical):", psnr_ec_h_1, " dB")
+print("PSNR - GTI X Canny - 2 (Vertical):", psnr_ec_h_2, " dB")
+print("PSNR - GTI X Canny - 3 (Vertical):", psnr_ec_h_3, " dB")
+print("PSNR - GTI X Canny - 4 (Vertical):", psnr_ec_h_4, " dB")
+print("PSNR - GTI X Canny - 5 (Vertical):", psnr_ec_h_5, " dB")
+print("PSNR - GTI X Canny - 6 (Vertical):", psnr_ec_h_6, " dB")
+print("PSNR - GTI X Canny - 7 (Vertical):", psnr_ec_h_7, " dB")
+print("PSNR - GTI X Canny - 8 (Vertical):", psnr_ec_h_8, " dB")
+print()
+
+# Peak Signal To Noise Ratio - Edge Detection - Laplacian
+print("Laplacian")
+print("PSNR - GTI X Laplacian - 1 (Horizontal):", psnr_el_h_1, " dB")
+print("PSNR - GTI X Laplacian - 2 (Horizontal):", psnr_el_h_2, " dB")
+print("PSNR - GTI X Laplacian - 3 (Horizontal):", psnr_el_h_3, " dB")
+print("PSNR - GTI X Laplacian - 4 (Horizontal):", psnr_el_h_4, " dB")
+print("PSNR - GTI X Laplacian - 1 (Vertical):", psnr_el_v_1, " dB")
+print("PSNR - GTI X Laplacian - 2 (Vertical):", psnr_el_v_2, " dB")
+print("PSNR - GTI X Laplacian - 3 (Vertical):", psnr_el_v_3, " dB")
+print("PSNR - GTI X Laplacian - 4 (Vertical):", psnr_el_v_4, " dB")
+
 # ----------------------------------------------------------------------------------------------------------- Show Compression Ratio
 print("---------- Compression Ratio ----------")
 # Compression Ratio - Scaled
@@ -169,22 +451,57 @@ print("Compression Ratio RAW X GTI (Horizontal): ", cr_raw_gti_h)
 print("Compression Ratio Raw X GTI (Vertical): ", cr_raw_gti_v)
 print()
 
+# Compression Ratio - GTI X Smoothed
+print("Gaussian Blur")
+print("Compression Ratio GTI X Gaussian Blur - 1 (Horizontal): ", cr_gti_sg_h_1)
+print("Compression Ratio GTI X Gaussian Blur - 2 (Horizontal): ", cr_gti_sg_h_2)
+print("Compression Ratio GTI X Gaussian Blur - 3 (Horizontal): ", cr_gti_sg_h_3)
+print("Compression Ratio GTI X Gaussian Blur - 1 (Vertical): ", cr_gti_sg_v_1)
+print("Compression Ratio GTI X Gaussian Blur - 2 (Vertical): ", cr_gti_sg_v_2)
+print("Compression Ratio GTI X Gaussian Blur - 3 (Vertical): ", cr_gti_sg_v_3)
+print()
+
+print("Bilateral Filtering")
+print("Compression Ratio GTI X Bilateral Filtering - 1 (Horizontal): ", cr_gti_sb_h_1)
+print("Compression Ratio GTI X Bilateral Filtering - 2 (Horizontal): ", cr_gti_sb_h_2)
+print("Compression Ratio GTI X Bilateral Filtering - 3 (Horizontal): ", cr_gti_sb_h_3)
+print("Compression Ratio GTI X Bilateral Filtering - 1 (Vertical): ", cr_gti_sb_v_1)
+print("Compression Ratio GTI X Bilateral Filtering - 2 (Vertical): ", cr_gti_sb_v_2)
+print("Compression Ratio GTI X Bilateral Filtering - 3 (Vertical): ", cr_gti_sb_v_3)
+print()
+
+# Compression Ratio - GTI X Edge Detection - Canny
+print("Canny")
+print("Compression Ratio GTI X Canny - 1 (Horizontal): ", cr_gti_ec_h_1)
+print("Compression Ratio GTI X Canny - 2 (Horizontal): ", cr_gti_ec_h_2)
+print("Compression Ratio GTI X Canny - 3 (Horizontal): ", cr_gti_ec_h_3)
+print("Compression Ratio GTI X Canny - 4 (Horizontal): ", cr_gti_ec_h_4)
+print("Compression Ratio GTI X Canny - 5 (Horizontal): ", cr_gti_ec_h_5)
+print("Compression Ratio GTI X Canny - 6 (Horizontal): ", cr_gti_ec_h_6)
+print("Compression Ratio GTI X Canny - 7 (Horizontal): ", cr_gti_ec_h_7)
+print("Compression Ratio GTI X Canny - 8 (Horizontal): ", cr_gti_ec_h_8)
+print("Compression Ratio GTI X Canny - 1 (Vertical): ", cr_gti_ec_v_1)
+print("Compression Ratio GTI X Canny - 2 (Vertical): ", cr_gti_ec_v_2)
+print("Compression Ratio GTI X Canny - 3 (Vertical): ", cr_gti_ec_v_3)
+print("Compression Ratio GTI X Canny - 4 (Vertical): ", cr_gti_ec_v_4)
+print("Compression Ratio GTI X Canny - 5 (Vertical): ", cr_gti_ec_v_5)
+print("Compression Ratio GTI X Canny - 6 (Vertical): ", cr_gti_ec_v_6)
+print("Compression Ratio GTI X Canny - 7 (Vertical): ", cr_gti_ec_v_7)
+print("Compression Ratio GTI X Canny - 8 (Vertical): ", cr_gti_ec_v_8)
+print()
+
+# Compression Ratio - GTI X Edge Detection - Laplacian
+print("Laplacian")
+print("Compression Ratio GTI X Laplacian - 1 (Horizontal): ", cr_gti_el_h_1)
+print("Compression Ratio GTI X Laplacian - 2 (Horizontal): ", cr_gti_el_h_2)
+print("Compression Ratio GTI X Laplacian - 3 (Horizontal): ", cr_gti_el_h_3)
+print("Compression Ratio GTI X Laplacian - 4 (Horizontal): ", cr_gti_el_h_4)
+print("Compression Ratio GTI X Laplacian - 1 (Vertical): ", cr_gti_el_v_1)
+print("Compression Ratio GTI X Laplacian - 2 (Vertical): ", cr_gti_el_v_2)
+print("Compression Ratio GTI X Laplacian - 3 (Vertical): ", cr_gti_el_v_3)
+print("Compression Ratio GTI X Laplacian - 4 (Vertical): ", cr_gti_el_v_4)
+print()
 # ----------------------------------------------------------------------------------------------------------- Show Image
-# Show Image - RAW
-# cv2.imshow("raw_h", raw_h)
-# cv2.imshow("raw_v", raw_v)
-
-# Show Image - GTI
-# cv2.imshow("gti_h", gti_h)
-# cv2.imshow("gti_v", gti_v)
-
-# Show Image - Smoothed - Gaussian
-# cv2.imshow("s_g_h", s_g_h)
-# cv2.imshow("s_g_v", s_g_v)
-
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
 
 exit()
 # ----------------------------------------------------------------------------------------------------------- Show
