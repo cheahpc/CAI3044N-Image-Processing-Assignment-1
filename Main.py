@@ -4,7 +4,7 @@ import cv2
 import os
 
 # Settings
-SAVE_NEW_GTI = False
+SAVE_NEW_GTI = True
 
 SAVE_NEW_SMOOTHED = True
 
@@ -138,14 +138,23 @@ ec_v_7 = cv2.Canny(sb_v_1, 75, 200)
 ec_v_8 = cv2.Canny(sb_v_1, 100, 225)
 
 # Apply Laplacian
-el_h_1 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=1))
-el_h_2 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=3))
-el_h_3 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=5))
-el_h_4 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_3, cv2.CV_16S, ksize=7))
-el_v_1 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=1))
-el_v_2 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=3))
-el_v_3 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=5))
-el_v_4 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_1, cv2.CV_16S, ksize=7))
+el_h_1 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=1, scale=1, delta=0))
+el_h_2 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=3, scale=1, delta=0))
+el_h_3 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=5, scale=1, delta=0))
+el_h_4 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=7, scale=1, delta=0))
+el_h_5 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=1, scale=2, delta=0))
+el_h_6 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=1, scale=8, delta=0))
+el_h_7 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=3, scale=2, delta=0))
+el_h_8 = cv2.convertScaleAbs(cv2.Laplacian(sb_h_2, cv2.CV_16S, ksize=3, scale=8, delta=0))
+
+el_v_1 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=1, scale=1, delta=0))
+el_v_2 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=3, scale=1, delta=0))
+el_v_3 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=5, scale=1, delta=0))
+el_v_4 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=7, scale=1, delta=0))
+el_v_5 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=1, scale=2, delta=0))
+el_v_6 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=1, scale=8, delta=0))
+el_v_7 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=3, scale=2, delta=0))
+el_v_8 = cv2.convertScaleAbs(cv2.Laplacian(sb_v_2, cv2.CV_16S, ksize=3, scale=8, delta=0))
 
 # Step 5: Save the images ===================================================================================
 # Smoothed
@@ -253,22 +262,40 @@ if SAVE_NEW_CANNY:
     cv2.imwrite(path_ec_v_7, ec_v_7)
     cv2.imwrite(path_ec_v_8, ec_v_8)
 
-el_h_list = [
+el_h_list_1 = [
     el_h_1,
     el_h_2,
     el_h_3,
     el_h_4,
 ]
 
-el_v_list = [
+el_h_list_2 = [
+    el_h_5,
+    el_h_6,
+    el_h_7,
+    el_h_8,
+]
+
+el_v_list_1 = [
     el_v_1,
     el_v_2,
     el_v_3,
     el_v_4,
 ]
 
-el_h = np.concatenate(el_h_list, 1)
-el_v = np.concatenate(el_v_list, 1)
+el_v_list_2 = [
+    el_v_5,
+    el_v_6,
+    el_v_7,
+    el_v_8,
+]
+
+el_h_a = np.concatenate(el_h_list_1, 1)
+el_h_b = np.concatenate(el_h_list_2, 1)
+el_h = np.concatenate([el_h_a, el_h_b], 0)
+el_v_a = np.concatenate(el_v_list_1, 1)
+el_v_b = np.concatenate(el_v_list_2, 1)
+el_v = np.concatenate([el_v_a, el_v_b], 0)
 
 if SAVE_NEW_LAPLACIAN:
     cv2.imwrite(path_el_h, el_h)
@@ -276,11 +303,19 @@ if SAVE_NEW_LAPLACIAN:
     cv2.imwrite(path_el_h_2, el_h_2)
     cv2.imwrite(path_el_h_3, el_h_3)
     cv2.imwrite(path_el_h_4, el_h_4)
+    cv2.imwrite(path_el_h_5, el_h_5)
+    cv2.imwrite(path_el_h_6, el_h_6)
+    cv2.imwrite(path_el_h_7, el_h_7)
+    cv2.imwrite(path_el_h_8, el_h_8)
     cv2.imwrite(path_el_v, el_v)
     cv2.imwrite(path_el_v_1, el_v_1)
     cv2.imwrite(path_el_v_2, el_v_2)
     cv2.imwrite(path_el_v_3, el_v_3)
     cv2.imwrite(path_el_v_4, el_v_4)
+    cv2.imwrite(path_el_v_5, el_v_5)
+    cv2.imwrite(path_el_v_6, el_v_6)
+    cv2.imwrite(path_el_v_7, el_v_7)
+    cv2.imwrite(path_el_v_8, el_v_8)
 
 # Step 6: Compute Peak Signal-to-Noise Ratio (PSNR) and compression ratio ===================================
 # PSNR - Smoothed Gaussian
@@ -323,10 +358,18 @@ psnr_el_h_1 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_1)), 4
 psnr_el_h_2 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_2)), 4)
 psnr_el_h_3 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_3)), 4)
 psnr_el_h_4 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_4)), 4)
+psnr_el_h_5 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_5)), 4)
+psnr_el_h_6 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_6)), 4)
+psnr_el_h_7 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_7)), 4)
+psnr_el_h_8 = round(cv2.PSNR(cv2.imread(path_gti_h), cv2.imread(path_el_h_8)), 4)
 psnr_el_v_1 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_1)), 4)
 psnr_el_v_2 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_2)), 4)
 psnr_el_v_3 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_3)), 4)
 psnr_el_v_4 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_4)), 4)
+psnr_el_v_5 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_5)), 4)
+psnr_el_v_6 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_6)), 4)
+psnr_el_v_7 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_7)), 4)
+psnr_el_v_8 = round(cv2.PSNR(cv2.imread(path_gti_v), cv2.imread(path_el_v_8)), 4)
 
 # Compression Ratio - RAW & GTI
 cr_raw_gti_h = round(os.path.getsize(path_raw_h) / os.path.getsize(path_gti_h), 4)
@@ -392,10 +435,11 @@ print("raw_v image shape: ", raw_v.shape, " | Type: ", raw_v.dtype, " | Size: ",
 print("gti_h image shape: ", gti_h.shape, " | Type: ", gti_h.dtype, " | Size: ", gti_h.size)
 print("gti_v image shape: ", gti_v.shape, " | Type: ", gti_v.dtype, " | Size: ", gti_v.size)
 print()
+print()
 # ----------------------------------------------------------------------------------------------------------- Show - PSNR
-print("---------- PSNR ----------")
+print("-------------------- Peak Signal To Noise Ratio (PSNR) --------------------")
 # Peak Signal To Noise Ratio - Smoothed
-print("Gaussian Blur")
+print("Gaussian Blur ------------------------------------------------------------- PSNR")
 print("PSNR - GTI X Gaussian Blur - 1 (Horizontal):", psnr_sg_h_1, " dB")
 print("PSNR - GTI X Gaussian Blur - 2 (Horizontal):", psnr_sg_h_2, " dB")
 print("PSNR - GTI X Gaussian Blur - 3 (Horizontal):", psnr_sg_h_3, " dB")
@@ -404,7 +448,7 @@ print("PSNR - GTI X Gaussian Blur - 2 (Vertical):", psnr_sg_v_2, " dB")
 print("PSNR - GTI X Gaussian Blur - 3 (Vertical):", psnr_sg_v_3, " dB")
 print()
 
-print("Bilateral Filtering")
+print("Bilateral Filtering ------------------------------------------------------- PSNR")
 print("PSNR - GTI X Bilateral Filtering - 1 (Horizontal):", psnr_sb_h_1, " dB")
 print("PSNR - GTI X Bilateral Filtering - 2 (Horizontal):", psnr_sb_h_2, " dB")
 print("PSNR - GTI X Bilateral Filtering - 3 (Horizontal):", psnr_sb_h_3, " dB")
@@ -414,7 +458,7 @@ print("PSNR - GTI X Bilateral Filtering - 3 (Vertical):", psnr_sb_v_3, " dB")
 print()
 
 # Peak Signal To Noise Ratio - Edge Detection - Canny
-print("Canny")
+print("Canny Edge Detection ------------------------------------------------------ PSNR")
 print("PSNR - GTI X Canny - 1 (Horizontal):", psnr_ec_h_1, " dB")
 print("PSNR - GTI X Canny - 2 (Horizontal):", psnr_ec_h_2, " dB")
 print("PSNR - GTI X Canny - 3 (Horizontal):", psnr_ec_h_3, " dB")
@@ -434,25 +478,34 @@ print("PSNR - GTI X Canny - 8 (Vertical):", psnr_ec_h_8, " dB")
 print()
 
 # Peak Signal To Noise Ratio - Edge Detection - Laplacian
-print("Laplacian")
+print("Laplacian Edge Detection -------------------------------------------------- PSNR")
 print("PSNR - GTI X Laplacian - 1 (Horizontal):", psnr_el_h_1, " dB")
 print("PSNR - GTI X Laplacian - 2 (Horizontal):", psnr_el_h_2, " dB")
 print("PSNR - GTI X Laplacian - 3 (Horizontal):", psnr_el_h_3, " dB")
 print("PSNR - GTI X Laplacian - 4 (Horizontal):", psnr_el_h_4, " dB")
+print("PSNR - GTI X Laplacian - 5 (Horizontal):", psnr_el_h_5, " dB")
+print("PSNR - GTI X Laplacian - 6 (Horizontal):", psnr_el_h_6, " dB")
+print("PSNR - GTI X Laplacian - 7 (Horizontal):", psnr_el_h_7, " dB")
+print("PSNR - GTI X Laplacian - 8 (Horizontal):", psnr_el_h_8, " dB")
 print("PSNR - GTI X Laplacian - 1 (Vertical):", psnr_el_v_1, " dB")
 print("PSNR - GTI X Laplacian - 2 (Vertical):", psnr_el_v_2, " dB")
 print("PSNR - GTI X Laplacian - 3 (Vertical):", psnr_el_v_3, " dB")
 print("PSNR - GTI X Laplacian - 4 (Vertical):", psnr_el_v_4, " dB")
-
+print("PSNR - GTI X Laplacian - 5 (Vertical):", psnr_el_v_5, " dB")
+print("PSNR - GTI X Laplacian - 6 (Vertical):", psnr_el_v_6, " dB")
+print("PSNR - GTI X Laplacian - 7 (Vertical):", psnr_el_v_7, " dB")
+print("PSNR - GTI X Laplacian - 8 (Vertical):", psnr_el_v_8, " dB")
+print()
+print()
 # ----------------------------------------------------------------------------------------------------------- Show Compression Ratio
-print("---------- Compression Ratio ----------")
+print("-------------------- Compression Ratio --------------------")
 # Compression Ratio - Scaled
 print("Compression Ratio RAW X GTI (Horizontal): ", cr_raw_gti_h)
 print("Compression Ratio Raw X GTI (Vertical): ", cr_raw_gti_v)
 print()
 
 # Compression Ratio - GTI X Smoothed
-print("Gaussian Blur")
+print("Gaussian Blur ---------------------------------------------------------- Compression Ratio")
 print("Compression Ratio GTI X Gaussian Blur - 1 (Horizontal): ", cr_gti_sg_h_1)
 print("Compression Ratio GTI X Gaussian Blur - 2 (Horizontal): ", cr_gti_sg_h_2)
 print("Compression Ratio GTI X Gaussian Blur - 3 (Horizontal): ", cr_gti_sg_h_3)
@@ -461,7 +514,7 @@ print("Compression Ratio GTI X Gaussian Blur - 2 (Vertical): ", cr_gti_sg_v_2)
 print("Compression Ratio GTI X Gaussian Blur - 3 (Vertical): ", cr_gti_sg_v_3)
 print()
 
-print("Bilateral Filtering")
+print("Bilateral Filtering ---------------------------------------------------- Compression Ratio")
 print("Compression Ratio GTI X Bilateral Filtering - 1 (Horizontal): ", cr_gti_sb_h_1)
 print("Compression Ratio GTI X Bilateral Filtering - 2 (Horizontal): ", cr_gti_sb_h_2)
 print("Compression Ratio GTI X Bilateral Filtering - 3 (Horizontal): ", cr_gti_sb_h_3)
@@ -471,7 +524,7 @@ print("Compression Ratio GTI X Bilateral Filtering - 3 (Vertical): ", cr_gti_sb_
 print()
 
 # Compression Ratio - GTI X Edge Detection - Canny
-print("Canny")
+print("Canny Edge Detection --------------------------------------------------- Compression Ratio")
 print("Compression Ratio GTI X Canny - 1 (Horizontal): ", cr_gti_ec_h_1)
 print("Compression Ratio GTI X Canny - 2 (Horizontal): ", cr_gti_ec_h_2)
 print("Compression Ratio GTI X Canny - 3 (Horizontal): ", cr_gti_ec_h_3)
@@ -491,15 +544,23 @@ print("Compression Ratio GTI X Canny - 8 (Vertical): ", cr_gti_ec_v_8)
 print()
 
 # Compression Ratio - GTI X Edge Detection - Laplacian
-print("Laplacian")
+print("Laplacian Edge Detection ----------------------------------------------- Compression Ratio")
 print("Compression Ratio GTI X Laplacian - 1 (Horizontal): ", cr_gti_el_h_1)
 print("Compression Ratio GTI X Laplacian - 2 (Horizontal): ", cr_gti_el_h_2)
 print("Compression Ratio GTI X Laplacian - 3 (Horizontal): ", cr_gti_el_h_3)
 print("Compression Ratio GTI X Laplacian - 4 (Horizontal): ", cr_gti_el_h_4)
+print("Compression Ratio GTI X Laplacian - 5 (Horizontal): ", cr_gti_el_h_5)
+print("Compression Ratio GTI X Laplacian - 6 (Horizontal): ", cr_gti_el_h_6)
+print("Compression Ratio GTI X Laplacian - 7 (Horizontal): ", cr_gti_el_h_7)
+print("Compression Ratio GTI X Laplacian - 8 (Horizontal): ", cr_gti_el_h_8)
 print("Compression Ratio GTI X Laplacian - 1 (Vertical): ", cr_gti_el_v_1)
 print("Compression Ratio GTI X Laplacian - 2 (Vertical): ", cr_gti_el_v_2)
 print("Compression Ratio GTI X Laplacian - 3 (Vertical): ", cr_gti_el_v_3)
 print("Compression Ratio GTI X Laplacian - 4 (Vertical): ", cr_gti_el_v_4)
+print("Compression Ratio GTI X Laplacian - 5 (Vertical): ", cr_gti_el_v_5)
+print("Compression Ratio GTI X Laplacian - 6 (Vertical): ", cr_gti_el_v_6)
+print("Compression Ratio GTI X Laplacian - 7 (Vertical): ", cr_gti_el_v_7)
+print("Compression Ratio GTI X Laplacian - 8 (Vertical): ", cr_gti_el_v_8)
 print()
 # ----------------------------------------------------------------------------------------------------------- Show Image
 
