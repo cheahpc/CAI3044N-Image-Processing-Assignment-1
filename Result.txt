@@ -60,57 +60,57 @@ PSNR - GTI X Laplacian - 8 (Vertical): 9.0771  dB
 
 
 -------------------- Compression Ratio --------------------
-Compression Ratio RAW X GTI (Horizontal):  29.4183
-Compression Ratio Raw X GTI (Vertical):  30.058
+Compression Ratio GTI / RAW (Horizontal):  0.034
+Compression Ratio GTI / RAW (Vertical):  0.0333
 
 Gaussian Blur ---------------------------------------------------------- Compression Ratio
-Compression Ratio GTI X Gaussian Blur - 1 (Horizontal):  1.2614
-Compression Ratio GTI X Gaussian Blur - 2 (Horizontal):  1.3853
-Compression Ratio GTI X Gaussian Blur - 3 (Horizontal):  1.5378
-Compression Ratio GTI X Gaussian Blur - 1 (Vertical):  1.5671
-Compression Ratio GTI X Gaussian Blur - 2 (Vertical):  1.8165
-Compression Ratio GTI X Gaussian Blur - 3 (Vertical):  2.054
+Compression Ratio Gaussian Blur / GTI - 1 (Horizontal):  0.7928
+Compression Ratio Gaussian Blur / GTI - 2 (Horizontal):  0.7219
+Compression Ratio Gaussian Blur / GTI - 3 (Horizontal):  0.6503
+Compression Ratio Gaussian Blur / GTI - 1 (Vertical):  0.6381
+Compression Ratio Gaussian Blur / GTI - 2 (Vertical):  0.5505
+Compression Ratio Gaussian Blur / GTI - 3 (Vertical):  0.4869
 
 Bilateral Filtering ---------------------------------------------------- Compression Ratio
-Compression Ratio GTI X Bilateral Filtering - 1 (Horizontal):  1.1955
-Compression Ratio GTI X Bilateral Filtering - 2 (Horizontal):  1.3685
-Compression Ratio GTI X Bilateral Filtering - 3 (Horizontal):  1.5513
-Compression Ratio GTI X Bilateral Filtering - 1 (Vertical):  1.3654
-Compression Ratio GTI X Bilateral Filtering - 2 (Vertical):  1.6899
-Compression Ratio GTI X Bilateral Filtering - 3 (Vertical):  1.9992
+Compression Ratio Bilateral Filtering / GTI - 1 (Horizontal):  0.8365
+Compression Ratio Bilateral Filtering / GTI - 2 (Horizontal):  0.7307
+Compression Ratio Bilateral Filtering / GTI - 3 (Horizontal):  0.6446
+Compression Ratio Bilateral Filtering / GTI - 1 (Vertical):  0.7324
+Compression Ratio Bilateral Filtering / GTI - 2 (Vertical):  0.5918
+Compression Ratio Bilateral Filtering / GTI - 3 (Vertical):  0.5002
 
 Canny Edge Detection --------------------------------------------------- Compression Ratio
-Compression Ratio GTI X Canny - 1 (Horizontal):  15.4065
-Compression Ratio GTI X Canny - 2 (Horizontal):  15.4126
-Compression Ratio GTI X Canny - 3 (Horizontal):  15.5817
-Compression Ratio GTI X Canny - 4 (Horizontal):  15.9037
-Compression Ratio GTI X Canny - 5 (Horizontal):  12.8183
-Compression Ratio GTI X Canny - 6 (Horizontal):  14.4894
-Compression Ratio GTI X Canny - 7 (Horizontal):  16.5641
-Compression Ratio GTI X Canny - 8 (Horizontal):  18.5927
-Compression Ratio GTI X Canny - 1 (Vertical):  20.6593
-Compression Ratio GTI X Canny - 2 (Vertical):  20.1046
-Compression Ratio GTI X Canny - 3 (Vertical):  19.6812
-Compression Ratio GTI X Canny - 4 (Vertical):  19.6364
-Compression Ratio GTI X Canny - 5 (Vertical):  17.5105
-Compression Ratio GTI X Canny - 6 (Vertical):  19.0501
-Compression Ratio GTI X Canny - 7 (Vertical):  20.7775
-Compression Ratio GTI X Canny - 8 (Vertical):  22.2049
+Compression Ratio Canny / GTI - 1 (Horizontal):  0.0649
+Compression Ratio Canny / GTI - 2 (Horizontal):  0.0649
+Compression Ratio Canny / GTI - 3 (Horizontal):  0.0642
+Compression Ratio Canny / GTI - 4 (Horizontal):  0.0629
+Compression Ratio Canny / GTI - 5 (Horizontal):  0.078
+Compression Ratio Canny / GTI - 6 (Horizontal):  0.069
+Compression Ratio Canny / GTI - 7 (Horizontal):  0.0604
+Compression Ratio Canny / GTI - 8 (Horizontal):  0.0538
+Compression Ratio Canny / GTI - 1 (Vertical):  0.0484
+Compression Ratio Canny / GTI - 2 (Vertical):  0.0497
+Compression Ratio Canny / GTI - 3 (Vertical):  0.0508
+Compression Ratio Canny / GTI - 4 (Vertical):  0.0509
+Compression Ratio Canny / GTI - 5 (Vertical):  0.0571
+Compression Ratio Canny / GTI - 6 (Vertical):  0.0525
+Compression Ratio Canny / GTI - 7 (Vertical):  0.0481
+Compression Ratio Canny / GTI - 8 (Vertical):  0.045
 
 Laplacian Edge Detection ----------------------------------------------- Compression Ratio
-Compression Ratio GTI X Laplacian - 1 (Horizontal):  1.4165
-Compression Ratio GTI X Laplacian - 2 (Horizontal):  1.265
-Compression Ratio GTI X Laplacian - 3 (Horizontal):  0.6838
-Compression Ratio GTI X Laplacian - 4 (Horizontal):  1.1657
-Compression Ratio GTI X Laplacian - 5 (Horizontal):  1.4166
-Compression Ratio GTI X Laplacian - 6 (Horizontal):  1.4259
-Compression Ratio GTI X Laplacian - 7 (Horizontal):  1.2683
-Compression Ratio GTI X Laplacian - 8 (Horizontal):  1.3245
-Compression Ratio GTI X Laplacian - 1 (Vertical):  1.4046
-Compression Ratio GTI X Laplacian - 2 (Vertical):  1.3617
-Compression Ratio GTI X Laplacian - 3 (Vertical):  0.7181
-Compression Ratio GTI X Laplacian - 4 (Vertical):  0.6921
-Compression Ratio GTI X Laplacian - 5 (Vertical):  1.4046
-Compression Ratio GTI X Laplacian - 6 (Vertical):  1.406
-Compression Ratio GTI X Laplacian - 7 (Vertical):  1.3624
-Compression Ratio GTI X Laplacian - 8 (Vertical):  1.4063
+Compression Ratio Laplacian / GTI - 1 (Horizontal):  0.706
+Compression Ratio Laplacian / GTI - 2 (Horizontal):  0.7905
+Compression Ratio Laplacian / GTI - 3 (Horizontal):  1.4625
+Compression Ratio Laplacian / GTI - 4 (Horizontal):  0.8578
+Compression Ratio Laplacian / GTI - 5 (Horizontal):  0.7059
+Compression Ratio Laplacian / GTI - 6 (Horizontal):  0.7013
+Compression Ratio Laplacian / GTI - 7 (Horizontal):  0.7885
+Compression Ratio Laplacian / GTI - 8 (Horizontal):  0.755
+Compression Ratio Laplacian / GTI - 1 (Vertical):  0.712
+Compression Ratio Laplacian / GTI - 2 (Vertical):  0.7344
+Compression Ratio Laplacian / GTI - 3 (Vertical):  1.3926
+Compression Ratio Laplacian / GTI - 4 (Vertical):  1.4448
+Compression Ratio Laplacian / GTI - 5 (Vertical):  0.7119
+Compression Ratio Laplacian / GTI - 6 (Vertical):  0.7112
+Compression Ratio Laplacian / GTI - 7 (Vertical):  0.734
+Compression Ratio Laplacian / GTI - 8 (Vertical):  0.7111
